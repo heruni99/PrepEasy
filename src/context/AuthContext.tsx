@@ -11,7 +11,7 @@ export interface AuthResponse {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  loginAsGuest: () => void;
+  loginAsGuest: () => Promise<void>;
   loginWithEmail: (email: string, password?: string, name?: string) => Promise<AuthResponse>;
   signUpWithEmail: (email: string, password?: string, name?: string) => Promise<AuthResponse>;
   logout: () => Promise<void>;
@@ -71,7 +71,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const loginAsGuest = () => {
+  const loginAsGuest = async () => {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.auth.signOut();
+      } catch (err) {
+        console.warn('Supabase signout on guest login', err);
+      }
+    }
     const guest: User = {
       id: 'guest-user',
       email: 'guest@prepeasy.app',

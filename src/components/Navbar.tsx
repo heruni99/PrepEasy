@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { UtensilsCrossed, Calendar, Heart, PlusCircle, ChefHat, UserCheck, LogOut } from 'lucide-react';
+import { UtensilsCrossed, Calendar, Heart, PlusCircle, ChefHat, UserCheck, LogOut, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 
@@ -122,25 +122,35 @@ export const Navbar: React.FC = () => {
                 </span>
               </div>
               <button
+                type="button"
                 onClick={logout}
-                title="Log Out"
+                title="Switch back to Guest Mode / Log Out"
                 id="nav-logout-btn"
-                className="p-1 rounded-lg text-stone-900 hover:bg-stone-900/10 transition-colors cursor-pointer"
+                className="flex items-center space-x-1 px-2 py-1 rounded-lg bg-white/80 hover:bg-white text-stone-900 text-[10px] font-black border border-stone-900 transition-all cursor-pointer shadow-[1px_1px_0px_0px_#1C1917]"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Log Out</span>
               </button>
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <div className="hidden sm:flex items-center px-2.5 py-1 rounded-xl bg-amber-100 border border-amber-300 text-stone-700 text-[10px] font-bold">
-                <span>⚡ Guest Mode</span>
-              </div>
               <button
+                type="button"
+                onClick={openAuthModal}
+                id="nav-guest-btn"
+                title="You are currently browsing in Guest Mode. Click to sign in or create an account."
+                className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-[#F8F3EB] hover:bg-amber-100 border-2 border-stone-900 text-stone-900 text-xs font-black transition-all shadow-[2px_2px_0px_0px_#1C1917] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+                <span>Guest Mode</span>
+              </button>
+              <button
+                type="button"
                 onClick={openAuthModal}
                 id="nav-auth-btn"
-                className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-[#FFD166] border-2 border-stone-900 text-stone-900 text-xs font-extrabold hover:bg-[#F3C450] transition-all shadow-[2px_2px_0px_0px_#1C1917] cursor-pointer"
+                className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-[#FF3B30] hover:bg-[#E6302B] text-white text-xs font-black border-2 border-stone-900 shadow-[2px_2px_0px_0px_#1C1917] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
               >
-                <UserCheck className="w-4 h-4" />
+                <UserCheck className="w-4 h-4 stroke-[2.5]" />
                 <span>Sign In / Up</span>
               </button>
             </div>

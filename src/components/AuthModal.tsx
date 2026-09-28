@@ -66,9 +66,9 @@ export const AuthModal: React.FC = () => {
     closeAuthModal();
   };
 
-  const handleGuestLogin = () => {
-    loginAsGuest();
-    addToast('Logged in as Guest', 'info');
+  const handleGuestLogin = async () => {
+    await loginAsGuest();
+    addToast('Now browsing in Guest Mode', 'info');
     closeAuthModal();
   };
 
@@ -221,10 +221,12 @@ export const AuthModal: React.FC = () => {
 
         {/* Quick Demo Login */}
         <button
+          type="button"
+          id="auth-guest-btn"
           onClick={handleGuestLogin}
-          className="w-full py-2.5 rounded-2xl bg-[#FFD166] text-stone-900 text-xs font-black border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] hover:bg-[#F3C450] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center justify-center space-x-2 transition-all"
+          className="w-full py-2.5 rounded-2xl bg-[#FFD166] hover:bg-[#F3C450] text-stone-900 text-xs font-black border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center justify-center space-x-2 transition-all cursor-pointer"
         >
-          <Sparkles className="w-4 h-4 text-stone-900" />
+          <Sparkles className="w-4 h-4 text-stone-900 fill-stone-900" />
           <span>Continue as Guest Demo</span>
         </button>
 

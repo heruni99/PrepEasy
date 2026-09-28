@@ -1,196 +1,156 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { UtensilsCrossed, Calendar, Heart, ChefHat, User, LogOut, Sparkles, PlusCircle } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { UtensilsCrossed, Calendar, Heart, PlusCircle, ChefHat, UserCheck, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 
 export const Navbar: React.FC = () => {
+  const location = useLocation();
   const { user, logout } = useAuth();
-  const { favorites, mealPlan, openAuthModal, openRecipeForm } = useApp();
+  const isGuest = user?.is_demo ?? false;
+  const { mealPlan, favorites, openRecipeForm, openAuthModal } = useApp();
 
-  const activePlannerCount = mealPlan.length;
-  const activeFavoritesCount = favorites.length;
+  const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 text-slate-100 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          
-          {/* Brand Logo & Name */}
-          <NavLink to="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center shadow-md shadow-orange-500/20 group-hover:scale-105 transition-transform duration-200">
-              <UtensilsCrossed className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-amber-400 via-orange-400 to-amber-200 bg-clip-text text-transparent">
-                PrepEasy
-              </span>
-              <span className="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                Student Meals
-              </span>
-            </div>
-          </NavLink>
+    <header className="sticky top-0 z-40 bg-[#FFFDF9]/90 backdrop-blur-md border-b-2 border-stone-900 shadow-sm">
+      
+      {/* Top Accent Strip */}
+      <div className="h-1.5 bg-[#FF3B30] w-full"></div>
 
-          {/* Nav Links */}
-          <nav className="hidden md:flex items-center space-x-1">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `flex items-center space-x-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`
-              }
-            >
-              <UtensilsCrossed className="w-4 h-4" />
-              <span>Recipes</span>
-            </NavLink>
-
-            <NavLink
-              to="/planner"
-              className={({ isActive }) =>
-                `flex items-center space-x-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors relative ${
-                  isActive
-                    ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`
-              }
-            >
-              <Calendar className="w-4 h-4" />
-              <span>Meal Planner</span>
-              {activePlannerCount > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 text-xs font-bold rounded-full bg-orange-500 text-white">
-                  {activePlannerCount}
-                </span>
-              )}
-            </NavLink>
-
-            <NavLink
-              to="/favorites"
-              className={({ isActive }) =>
-                `flex items-center space-x-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors relative ${
-                  isActive
-                    ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`
-              }
-            >
-              <Heart className="w-4 h-4" />
-              <span>Favorites</span>
-              {activeFavoritesCount > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 text-xs font-bold rounded-full bg-rose-500 text-white">
-                  {activeFavoritesCount}
-                </span>
-              )}
-            </NavLink>
-
-            <NavLink
-              to="/my-recipes"
-              className={({ isActive }) =>
-                `flex items-center space-x-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`
-              }
-            >
-              <ChefHat className="w-4 h-4" />
-              <span>My Recipes</span>
-            </NavLink>
-          </nav>
-
-          {/* Right Action Buttons & User Menu */}
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => openRecipeForm()}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 hover:from-amber-400 hover:to-orange-400 shadow-md shadow-orange-500/20 active:scale-95 transition-all"
-            >
-              <PlusCircle className="w-4 h-4" />
-              <span className="hidden sm:inline">Add Recipe</span>
-            </button>
-
-            {user ? (
-              <div className="flex items-center space-x-2 bg-slate-800/80 border border-slate-700/60 rounded-lg pl-3 pr-1.5 py-1">
-                <div className="flex flex-col text-right hidden sm:block">
-                  <span className="text-xs font-bold text-slate-200">{user.name || user.email}</span>
-                  {user.is_demo && (
-                    <span className="text-[10px] text-amber-400 font-semibold flex items-center justify-end gap-0.5">
-                      <Sparkles className="w-2.5 h-2.5" /> Guest Mode
-                    </span>
-                  )}
-                </div>
-                <button
-                  onClick={() => logout()}
-                  title="Log out"
-                  className="p-1.5 rounded-md text-slate-400 hover:text-rose-400 hover:bg-slate-700/60 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={openAuthModal}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-colors"
-              >
-                <User className="w-4 h-4 text-amber-400" />
-                <span>Sign In</span>
-              </button>
-            )}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+        
+        {/* Brand Logo & Name */}
+        <Link to="/" className="flex items-center space-x-3 group">
+          <div className="w-11 h-11 rounded-2xl bg-[#FF3B30] text-white flex items-center justify-center border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] group-hover:rotate-3 transition-transform">
+            <UtensilsCrossed className="w-6 h-6 stroke-[2.5]" />
           </div>
+          <div className="flex flex-col">
+            <span className="text-2xl font-black tracking-tight text-stone-900 font-heading">
+              Prep<span className="text-[#FF3B30]">Easy</span>
+            </span>
+            <span className="text-[10px] font-bold text-stone-600 -mt-1 uppercase tracking-wider">
+              Student Meal Planner
+            </span>
+          </div>
+        </Link>
+
+        {/* Center Route Links */}
+        <nav className="hidden md:flex items-center space-x-2 bg-[#F8F3EB] p-1.5 rounded-2xl border-2 border-stone-900 shadow-[2px_2px_0px_0px_#1C1917]">
+          
+          <Link
+            to="/"
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              isActive('/')
+                ? 'bg-[#FF3B30] text-white shadow-[2px_2px_0px_0px_#1C1917] border border-stone-900'
+                : 'text-stone-800 hover:text-stone-950 hover:bg-stone-200/60'
+            }`}
+          >
+            <UtensilsCrossed className="w-4 h-4" />
+            <span>Browse Recipes</span>
+          </Link>
+
+          <Link
+            to="/planner"
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all relative ${
+              isActive('/planner')
+                ? 'bg-[#FF3B30] text-white shadow-[2px_2px_0px_0px_#1C1917] border border-stone-900'
+                : 'text-stone-800 hover:text-stone-950 hover:bg-stone-200/60'
+            }`}
+          >
+            <Calendar className="w-4 h-4" />
+            <span>Meal Planner</span>
+            {mealPlan.length > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 text-[10px] font-black rounded-full bg-[#FFD166] text-stone-900 border border-stone-900">
+                {mealPlan.length}
+              </span>
+            )}
+          </Link>
+
+          <Link
+            to="/favorites"
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              isActive('/favorites')
+                ? 'bg-[#FF3B30] text-white shadow-[2px_2px_0px_0px_#1C1917] border border-stone-900'
+                : 'text-stone-800 hover:text-stone-950 hover:bg-stone-200/60'
+            }`}
+          >
+            <Heart className="w-4 h-4" />
+            <span>Favorites</span>
+            {favorites.length > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 text-[10px] font-black rounded-full bg-[#FFD166] text-stone-900 border border-stone-900">
+                {favorites.length}
+              </span>
+            )}
+          </Link>
+
+          <Link
+            to="/my-recipes"
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              isActive('/my-recipes')
+                ? 'bg-[#FF3B30] text-white shadow-[2px_2px_0px_0px_#1C1917] border border-stone-900'
+                : 'text-stone-800 hover:text-stone-950 hover:bg-stone-200/60'
+            }`}
+          >
+            <ChefHat className="w-4 h-4" />
+            <span>My Recipes</span>
+          </Link>
+
+        </nav>
+
+        {/* Right Action Bar */}
+        <div className="flex items-center space-x-3">
+          
+          {/* Add Recipe CTA */}
+          <button
+            onClick={() => openRecipeForm()}
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#FF3B30] text-white text-xs font-extrabold border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] hover:bg-[#E6302B] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+          >
+            <PlusCircle className="w-4 h-4 stroke-[2.5]" />
+            <span className="hidden sm:inline">Add Recipe</span>
+          </button>
+
+          {/* User Profile / Auth State */}
+          {user ? (
+            <div className="flex items-center space-x-2 bg-[#FFD166] border-2 border-stone-900 rounded-xl px-3 py-1.5 shadow-[2px_2px_0px_0px_#1C1917]">
+              <div className="flex flex-col text-right">
+                <span className="text-xs font-extrabold text-stone-900 line-clamp-1">
+                  {user.name || user.email.split('@')[0]}
+                </span>
+                <span className="text-[9px] font-bold text-stone-700 uppercase tracking-wider">
+                  {isGuest ? '⚡ Guest Student' : 'Member'}
+                </span>
+              </div>
+              <button
+                onClick={logout}
+                title="Log Out"
+                className="p-1 rounded-lg text-stone-900 hover:bg-stone-900/10 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={openAuthModal}
+              className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-[#F8F3EB] border-2 border-stone-900 text-stone-900 text-xs font-extrabold hover:bg-stone-200/70 transition-all shadow-[2px_2px_0px_0px_#1C1917]"
+            >
+              <UserCheck className="w-4 h-4" />
+              <span>Sign In</span>
+            </button>
+          )}
 
         </div>
+
       </div>
 
-      {/* Mobile Nav Bar Links (bottom tab bar for mobile view) */}
-      <div className="md:hidden flex items-center justify-around border-t border-slate-800 bg-slate-950 py-2 px-2">
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            `flex flex-col items-center text-xs font-medium ${isActive ? 'text-amber-400' : 'text-slate-400'}`
-          }
-        >
-          <UtensilsCrossed className="w-5 h-5 mb-0.5" />
-          <span>Recipes</span>
-        </NavLink>
-        <NavLink
-          to="/planner"
-          className={({ isActive }) =>
-            `flex flex-col items-center text-xs font-medium relative ${isActive ? 'text-amber-400' : 'text-slate-400'}`
-          }
-        >
-          <Calendar className="w-5 h-5 mb-0.5" />
-          <span>Planner</span>
-          {activePlannerCount > 0 && (
-            <span className="absolute -top-1 right-2 px-1 py-0.2 text-[9px] font-bold rounded-full bg-orange-500 text-white">
-              {activePlannerCount}
-            </span>
-          )}
-        </NavLink>
-        <NavLink
-          to="/favorites"
-          className={({ isActive }) =>
-            `flex flex-col items-center text-xs font-medium relative ${isActive ? 'text-amber-400' : 'text-slate-400'}`
-          }
-        >
-          <Heart className="w-5 h-5 mb-0.5" />
-          <span>Favorites</span>
-          {activeFavoritesCount > 0 && (
-            <span className="absolute -top-1 right-2 px-1 py-0.2 text-[9px] font-bold rounded-full bg-rose-500 text-white">
-              {activeFavoritesCount}
-            </span>
-          )}
-        </NavLink>
-        <NavLink
-          to="/my-recipes"
-          className={({ isActive }) =>
-            `flex flex-col items-center text-xs font-medium ${isActive ? 'text-amber-400' : 'text-slate-400'}`
-          }
-        >
-          <ChefHat className="w-5 h-5 mb-0.5" />
-          <span>Mine</span>
-        </NavLink>
+      {/* Mobile Nav Links */}
+      <div className="flex md:hidden items-center justify-around border-t border-stone-300 py-2 bg-[#F8F3EB]">
+        <Link to="/" className={`text-xs font-bold ${isActive('/') ? 'text-[#FF3B30]' : 'text-stone-700'}`}>Browse</Link>
+        <Link to="/planner" className={`text-xs font-bold ${isActive('/planner') ? 'text-[#FF3B30]' : 'text-stone-700'}`}>Planner ({mealPlan.length})</Link>
+        <Link to="/favorites" className={`text-xs font-bold ${isActive('/favorites') ? 'text-[#FF3B30]' : 'text-stone-700'}`}>Favorites ({favorites.length})</Link>
+        <Link to="/my-recipes" className={`text-xs font-bold ${isActive('/my-recipes') ? 'text-[#FF3B30]' : 'text-stone-700'}`}>My Recipes</Link>
       </div>
+
     </header>
   );
 };

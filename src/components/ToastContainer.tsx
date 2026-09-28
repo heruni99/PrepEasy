@@ -17,30 +17,30 @@ export const ToastContainer: React.FC = () => {
         return (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-center justify-between p-3.5 rounded-2xl border shadow-xl backdrop-blur-md animate-in slide-in-from-bottom duration-300 ${
+            className={`pointer-events-auto flex items-center justify-between p-3.5 rounded-2xl border-2 border-stone-900 shadow-[4px_4px_0px_0px_#1C1917] backdrop-blur-md animate-in slide-in-from-bottom duration-300 ${
               isSuccess
-                ? 'bg-slate-900/95 border-emerald-500/40 text-emerald-300'
+                ? 'bg-emerald-50 text-emerald-950'
                 : isWarning
-                ? 'bg-slate-900/95 border-amber-500/40 text-amber-300'
+                ? 'bg-amber-50 text-amber-950'
                 : isError
-                ? 'bg-slate-900/95 border-rose-500/40 text-rose-300'
-                : 'bg-slate-900/95 border-sky-500/40 text-sky-300'
+                ? 'bg-rose-50 text-rose-950'
+                : 'bg-sky-50 text-sky-950'
             }`}
           >
             <div className="flex items-center space-x-2.5">
-              {isSuccess && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
-              {isWarning && <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />}
-              {isError && <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />}
-              {!isSuccess && !isWarning && !isError && <Info className="w-4 h-4 text-sky-400 shrink-0" />}
+              {isSuccess && <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0 stroke-[2.5]" />}
+              {isWarning && <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0 stroke-[2.5]" />}
+              {isError && <AlertCircle className="w-4 h-4 text-rose-700 shrink-0 stroke-[2.5]" />}
+              {!isSuccess && !isWarning && !isError && <Info className="w-4 h-4 text-sky-700 shrink-0 stroke-[2.5]" />}
               
-              <span className="text-xs font-semibold text-slate-100">{toast.message}</span>
+              <span className="text-xs font-black text-stone-900">{toast.message}</span>
             </div>
 
             <button
               onClick={() => removeToast(toast.id)}
-              className="ml-2 text-slate-400 hover:text-white"
+              className="ml-2 text-stone-700 hover:text-stone-950 p-0.5 rounded-lg hover:bg-stone-200"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-3.5 h-3.5 stroke-[2.5]" />
             </button>
           </div>
         );

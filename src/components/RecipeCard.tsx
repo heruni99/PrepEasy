@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, Heart, CalendarPlus, Check, ChefHat } from 'lucide-react';
+import { Clock, Heart, CalendarPlus, ChefHat } from 'lucide-react';
 import type { Recipe, MealType } from '../types';
 import { useApp } from '../context/AppContext';
 
@@ -8,220 +8,163 @@ interface RecipeCardProps {
 }
 
 const DAYS_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const MEALS: MealType[] = ['breakfast', 'lunch', 'dinner'];
 
 export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
-  const { favorites, toggleFavorite, setMealPlanSlot, openRecipeDetails } = useApp();
-  const [showPlannerDropdown, setShowPlannerDropdown] = useState(false);
-  const [selectedDay, setSelectedDay] = useState<number>(0);
-  const [selectedMeal, setSelectedMeal] = useState<MealType>('dinner');
-  const [isAddedAnimation, setIsAddedAnimation] = useState(false);
+  const { favorites, toggleFavorite, setMealPlanSlot, openRecipeDetails, addToast } = useApp();
+  const [showPlannerMenu, setShowPlannerMenu] = useState(false);
 
-  const isFavorite = favorites.includes(recipe.id);
+  const favorited = favorites.includes(recipe.id);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleFavorite(recipe.id);
   };
 
-  const handleAddToPlanner = (e: React.MouseEvent) => {
+  const handleAssignMeal = (dayIdx: number, mealType: MealType, e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowPlannerDropdown(!showPlannerDropdown);
+    setMealPlanSlot(dayIdx, mealType, recipe.id);
+    addToast(`Added "${recipe.title}" to ${DAYS_SHORT[dayIdx]} ${mealType}!`, 'success');
+    setShowPlannerMenu(false);
   };
-
-  const handleConfirmPlannerAdd = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setMealPlanSlot(selectedDay, selectedMeal, recipe.id);
-    setIsAddedAnimation(true);
-    setTimeout(() => {
-      setIsAddedAnimation(false);
-      setShowPlannerDropdown(false);
-    }, 600);
-  };
-
-  const costSymbol = '$'.repeat(recipe.cost_level);
 
   return (
     <div
       onClick={() => openRecipeDetails(recipe)}
-      className="group bg-slate-900 border border-slate-800 hover:border-amber-500/50 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 flex flex-col cursor-pointer relative"
+      className="bg-white border-2 border-stone-900 rounded-3xl overflow-hidden shadow-[3px_3px_0px_0px_#1C1917] hover:shadow-[6px_6px_0px_0px_#1C1917] hover:-translate-y-1 transition-all cursor-pointer flex flex-col group relative"
     >
-      
-      {/* Recipe Image & Overlay Badges */}
-      <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-950">
+      {/* Image Banner Container */}
+      <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-stone-100 border-b-2 border-stone-900">
         <img
           src={recipe.image_url}
           alt={recipe.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          onError={(e) => {
-            // Fallback for broken image URL
-            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
-          }}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          loading="lazy"
         />
-        
-        {/* Dark Vignette Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/40" />
 
         {/* Top Floating Badges */}
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
+        <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
           
           {/* Prep Time Badge */}
-          <span className="flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-950/80 backdrop-blur-md text-amber-400 border border-amber-500/30">
-            <Clock className="w-3.5 h-3.5" />
+          <div className="pointer-events-auto bg-[#FFD166] text-stone-900 text-xs font-black px-2.5 py-1 rounded-xl border-2 border-stone-900 shadow-[2px_2px_0px_0px_#1C1917] flex items-center space-x-1">
+            <Clock className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>{recipe.prep_time_minutes} min</span>
-          </span>
+          </div>
 
-          {/* Right Action Controls (Favorite & Quick Add) */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 pointer-events-auto">
             
-            {/* Favorite Star Button */}
+            {/* Quick Meal Plan Assign Button */}
+            <div className="relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowPlannerMenu(!showPlannerMenu);
+                }}
+                className="w-9 h-9 rounded-xl bg-white border-2 border-stone-900 shadow-[2px_2px_0px_0px_#1C1917] flex items-center justify-center text-stone-900 hover:bg-[#FF3B30] hover:text-white transition-all active:scale-95"
+                title="Add to weekly meal plan"
+              >
+                <CalendarPlus className="w-4 h-4 stroke-[2.5]" />
+              </button>
+
+              {/* Quick Meal Slot Picker Dropdown */}
+              {showPlannerMenu && (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute right-0 top-11 z-30 bg-white border-2 border-stone-900 rounded-2xl p-3 shadow-[4px_4px_0px_0px_#1C1917] w-56 space-y-2 animate-in fade-in duration-150"
+                >
+                  <div className="flex items-center justify-between border-b border-stone-200 pb-1.5">
+                    <span className="text-[10px] font-black uppercase text-stone-700">Add to Meal Plan</span>
+                    <button
+                      onClick={() => setShowPlannerMenu(false)}
+                      className="text-[10px] font-bold text-[#FF3B30]"
+                    >
+                      Close
+                    </button>
+                  </div>
+
+                  <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                    {DAYS_SHORT.map((day, dayIdx) => (
+                      <div key={day} className="flex items-center justify-between text-[11px] font-bold">
+                        <span className="text-stone-700 w-10">{day}:</span>
+                        <div className="flex space-x-1">
+                          {(['breakfast', 'lunch', 'dinner'] as MealType[]).map((meal) => (
+                            <button
+                              key={meal}
+                              onClick={(e) => handleAssignMeal(dayIdx, meal, e)}
+                              className="px-1.5 py-0.5 rounded-lg bg-[#F8F3EB] hover:bg-[#FF3B30] hover:text-white border border-stone-900 text-[9px] font-black capitalize transition-colors"
+                            >
+                              {meal[0]}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Favorite Heart Toggle */}
             <button
               onClick={handleFavoriteClick}
-              title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-              className={`p-2 rounded-full backdrop-blur-md transition-all active:scale-90 ${
-                isFavorite
-                  ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30'
-                  : 'bg-slate-950/80 text-slate-300 hover:text-rose-400 hover:bg-slate-900 border border-slate-700/60'
+              className={`w-9 h-9 rounded-xl border-2 border-stone-900 shadow-[2px_2px_0px_0px_#1C1917] flex items-center justify-center transition-all active:scale-90 ${
+                favorited
+                  ? 'bg-[#FF3B30] text-white'
+                  : 'bg-white text-stone-700 hover:text-[#FF3B30]'
               }`}
+              title={favorited ? 'Remove from favorites' : 'Add to favorites'}
             >
-              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+              <Heart className={`w-4 h-4 stroke-[2.5] ${favorited ? 'fill-current' : ''}`} />
             </button>
 
-            {/* Quick Meal Plan Button */}
-            <button
-              onClick={handleAddToPlanner}
-              title="Add to weekly meal plan"
-              className="p-2 rounded-full bg-slate-950/80 hover:bg-amber-500 text-slate-300 hover:text-slate-950 border border-slate-700/60 backdrop-blur-md transition-all active:scale-90"
-            >
-              <CalendarPlus className="w-4 h-4" />
-            </button>
           </div>
 
         </div>
 
         {/* User Submitted Badge */}
         {recipe.is_user_submitted && (
-          <span className="absolute bottom-3 left-3 flex items-center space-x-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-500/90 text-slate-950 shadow-md">
+          <div className="absolute bottom-2 left-2 bg-[#06D6A0] text-stone-950 text-[10px] font-black px-2 py-0.5 rounded-lg border border-stone-900 flex items-center space-x-1 shadow-[1px_1px_0px_0px_#1C1917]">
             <ChefHat className="w-3 h-3" />
-            <span>Community Recipe</span>
-          </span>
+            <span>Student Created</span>
+          </div>
         )}
-
-        {/* Cost Badge */}
-        <span className="absolute bottom-3 right-3 px-2 py-0.5 rounded-md text-xs font-extrabold bg-slate-950/90 backdrop-blur-md text-emerald-400 border border-emerald-500/30">
-          {costSymbol}
-        </span>
-
       </div>
 
-      {/* Quick Add To Planner Dropdown Drawer Overlay */}
-      {showPlannerDropdown && (
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className="absolute inset-x-3 top-16 z-20 bg-slate-950/95 border border-amber-500/40 rounded-xl p-3 shadow-2xl backdrop-blur-md space-y-3 animate-in fade-in zoom-in duration-200"
-        >
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-            <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
-              <CalendarPlus className="w-3.5 h-3.5" /> Plan Recipe
-            </span>
-            <button
-              onClick={() => setShowPlannerDropdown(false)}
-              className="text-slate-400 hover:text-white text-xs font-bold px-1"
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* Select Day */}
-          <div>
-            <label className="text-[11px] font-semibold text-slate-400 block mb-1">Day of Week</label>
-            <div className="grid grid-cols-7 gap-1">
-              {DAYS_SHORT.map((day, idx) => (
-                <button
-                  key={day}
-                  type="button"
-                  onClick={() => setSelectedDay(idx)}
-                  className={`py-1 rounded text-[10px] font-bold transition-colors ${
-                    selectedDay === idx
-                      ? 'bg-amber-500 text-slate-950'
-                      : 'bg-slate-900 text-slate-300 hover:bg-slate-800'
-                  }`}
-                >
-                  {day}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Select Meal */}
-          <div>
-            <label className="text-[11px] font-semibold text-slate-400 block mb-1">Meal Time</label>
-            <div className="grid grid-cols-3 gap-1">
-              {MEALS.map(meal => (
-                <button
-                  key={meal}
-                  type="button"
-                  onClick={() => setSelectedMeal(meal)}
-                  className={`py-1 rounded text-[10px] font-bold capitalize transition-colors ${
-                    selectedMeal === meal
-                      ? 'bg-orange-500 text-white'
-                      : 'bg-slate-900 text-slate-300 hover:bg-slate-800'
-                  }`}
-                >
-                  {meal}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Confirm Add Button */}
-          <button
-            onClick={handleConfirmPlannerAdd}
-            className="w-full py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-xs font-bold flex items-center justify-center space-x-1 hover:from-amber-400 hover:to-orange-400 active:scale-95 transition-all"
-          >
-            {isAddedAnimation ? (
-              <>
-                <Check className="w-4 h-4 text-slate-950" />
-                <span>Added to Plan!</span>
-              </>
-            ) : (
-              <span>Add to {DAYS_SHORT[selectedDay]} {selectedMeal}</span>
-            )}
-          </button>
-        </div>
-      )}
-
-      {/* Card Content & Details */}
-      <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+      {/* Card Content Section */}
+      <div className="p-4 flex-1 flex flex-col justify-between space-y-3 bg-[#FFFDF9]">
         
         <div>
-          <h3 className="font-bold text-base text-slate-100 group-hover:text-amber-400 transition-colors line-clamp-1 mb-1">
+          <h3 className="font-extrabold text-base text-stone-900 group-hover:text-[#FF3B30] transition-colors leading-snug line-clamp-2 font-heading">
             {recipe.title}
           </h3>
-          <p className="text-xs text-slate-400 line-clamp-2">
-            {recipe.ingredients.length} ingredients • {recipe.steps.length} steps guide
-          </p>
+
+          <div className="flex items-center space-x-2 mt-1">
+            <span className="text-xs font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md border border-stone-900">
+              {'$'.repeat(recipe.cost_level)}
+            </span>
+            <span className="text-[11px] font-bold text-stone-500">
+              {recipe.ingredients.length} ingredients • {recipe.steps.length} steps
+            </span>
+          </div>
         </div>
 
-        {/* Diet Tags Pills */}
-        <div className="flex flex-wrap gap-1.5 pt-1">
+        {/* Dietary Tag Badges */}
+        <div className="flex flex-wrap gap-1.5 pt-1 border-t border-stone-200">
           {recipe.diet_tags.slice(0, 3).map(tag => (
             <span
               key={tag}
-              className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-950 text-slate-300 border border-slate-800"
+              className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#F8F3EB] text-stone-800 border border-stone-900"
             >
               {tag}
             </span>
           ))}
           {recipe.diet_tags.length > 3 && (
-            <span className="px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-slate-950 text-slate-500 border border-slate-800">
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-stone-200 text-stone-700">
               +{recipe.diet_tags.length - 3}
             </span>
           )}
         </div>
 
       </div>
-
     </div>
   );
 };

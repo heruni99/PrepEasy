@@ -1,286 +1,220 @@
 import React, { useState } from 'react';
-import { X, Clock, DollarSign, Heart, CalendarPlus, CheckSquare, Square, ChefHat, Trash2, Edit3 } from 'lucide-react';
+import { X, Clock, DollarSign, Heart, CalendarPlus, CheckSquare, Square, Trash2, Edit3 } from 'lucide-react';
 import type { MealType } from '../types';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 
 const DAYS_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const MEALS: MealType[] = ['breakfast', 'lunch', 'dinner'];
+const MEALS: { type: MealType; label: string }[] = [
+  { type: 'breakfast', label: 'Breakfast' },
+  { type: 'lunch', label: 'Lunch' },
+  { type: 'dinner', label: 'Dinner' }
+];
 
 export const RecipeDetailModal: React.FC = () => {
   const { user } = useAuth();
-  const { selectedRecipe, openRecipeDetails, favorites, toggleFavorite, setMealPlanSlot, deleteRecipe, openRecipeForm } = useApp();
+  const { selectedRecipe, openRecipeDetails, favorites, toggleFavorite, setMealPlanSlot, deleteRecipe, openRecipeForm, addToast } = useApp();
+  const closeRecipeDetails = () => openRecipeDetails(null);
   
   const [checkedIngredients, setCheckedIngredients] = useState<Record<number, boolean>>({});
   const [completedSteps, setCompletedSteps] = useState<Record<number, boolean>>({});
-  const [showPlannerSection, setShowPlannerSection] = useState(false);
-  const [selectedDay, setSelectedDay] = useState(0);
-  const [selectedMeal, setSelectedMeal] = useState<MealType>('dinner');
 
   if (!selectedRecipe) return null;
 
-  const isFavorite = favorites.includes(selectedRecipe.id);
-  const isOwner = selectedRecipe.is_user_submitted || (user && selectedRecipe.owner_id === user.id);
+  const favorited = favorites.includes(selectedRecipe.id);
+  const isOwner = selectedRecipe.owner_id === user?.id || (selectedRecipe.is_user_submitted && user?.is_demo);
 
-  const toggleIngredientCheck = (idx: number) => {
+  const toggleIngredient = (idx: number) => {
     setCheckedIngredients(prev => ({ ...prev, [idx]: !prev[idx] }));
   };
 
-  const toggleStepCheck = (idx: number) => {
+  const toggleStep = (idx: number) => {
     setCompletedSteps(prev => ({ ...prev, [idx]: !prev[idx] }));
   };
 
-  const handleAssignToMealPlan = () => {
-    setMealPlanSlot(selectedDay, selectedMeal, selectedRecipe.id);
-    setShowPlannerSection(false);
+  const handleAssignMeal = (dayIdx: number, mealType: MealType) => {
+    setMealPlanSlot(dayIdx, mealType, selectedRecipe.id);
+    addToast(`Added "${selectedRecipe.title}" to ${DAYS_FULL[dayIdx]} ${mealType}!`, 'success');
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm(`Are you sure you want to delete "${selectedRecipe.title}"?`)) {
-      deleteRecipe(selectedRecipe.id);
+      await deleteRecipe(selectedRecipe.id);
+      addToast('Recipe deleted', 'info');
+      closeRecipeDetails();
     }
   };
 
-  const handleEdit = () => {
-    openRecipeForm(selectedRecipe);
-  };
-
-  const costSymbol = '$'.repeat(selectedRecipe.cost_level);
-
   return (
     <div
-      onClick={() => openRecipeDetails(null)}
-      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200"
+      onClick={closeRecipeDetails}
+      className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative flex flex-col text-slate-100"
+        className="bg-[#FFFDF9] border-2 border-stone-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1C1917] relative text-stone-900 space-y-6 max-h-[90vh] overflow-y-auto"
       >
-        
-        {/* Header Image & Action Buttons */}
-        <div className="relative h-64 sm:h-72 w-full bg-slate-950">
-          <img
-            src={selectedRecipe.image_url}
-            alt={selectedRecipe.title}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/30 to-black/60" />
+        {/* Close Button */}
+        <button
+          onClick={closeRecipeDetails}
+          className="absolute top-4 right-4 p-2 rounded-xl bg-[#F8F3EB] border-2 border-stone-900 text-stone-800 hover:bg-[#FF3B30] hover:text-white transition-all shadow-[2px_2px_0px_0px_#1C1917]"
+        >
+          <X className="w-5 h-5 stroke-[2.5]" />
+        </button>
 
-          {/* Close Modal Button */}
-          <button
-            onClick={() => openRecipeDetails(null)}
-            className="absolute top-4 right-4 p-2 rounded-full bg-slate-950/80 text-slate-300 hover:text-white border border-slate-700/60 backdrop-blur-md transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-
-          {/* Owner Controls (Edit/Delete) */}
-          {isOwner && (
-            <div className="absolute top-4 left-4 flex items-center space-x-2">
-              <button
-                onClick={handleEdit}
-                className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-950/80 hover:bg-slate-800 text-amber-400 border border-amber-500/40 text-xs font-semibold backdrop-blur-md transition-colors"
-              >
-                <Edit3 className="w-3.5 h-3.5" />
-                <span>Edit</span>
-              </button>
-              <button
-                onClick={handleDelete}
-                className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-950/80 hover:bg-rose-950/80 text-rose-400 border border-rose-500/40 text-xs font-semibold backdrop-blur-md transition-colors"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>Delete</span>
-              </button>
-            </div>
-          )}
-
-          {/* Floating Action Buttons */}
-          <div className="absolute bottom-4 right-4 flex items-center space-x-2">
-            
+        {/* Hero Image & Title Bar */}
+        <div className="space-y-4">
+          <div className="relative h-60 sm:h-72 w-full rounded-2xl overflow-hidden border-2 border-stone-900 shadow-[4px_4px_0px_0px_#1C1917]">
+            <img
+              src={selectedRecipe.image_url}
+              alt={selectedRecipe.title}
+              className="w-full h-full object-cover"
+            />
             <button
               onClick={() => toggleFavorite(selectedRecipe.id)}
-              className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-lg ${
-                isFavorite
-                  ? 'bg-rose-500 text-white shadow-rose-500/30'
-                  : 'bg-slate-950/80 text-slate-200 border border-slate-700 hover:bg-slate-800'
+              className={`absolute top-4 right-4 w-11 h-11 rounded-2xl border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] flex items-center justify-center transition-all ${
+                favorited ? 'bg-[#FF3B30] text-white' : 'bg-white text-stone-800 hover:text-[#FF3B30]'
               }`}
             >
-              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
-              <span>{isFavorite ? 'Favorited' : 'Favorite'}</span>
-            </button>
-
-            <button
-              onClick={() => setShowPlannerSection(!showPlannerSection)}
-              className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-lg shadow-amber-500/20 transition-all"
-            >
-              <CalendarPlus className="w-4 h-4" />
-              <span>Add to Planner</span>
+              <Heart className={`w-5 h-5 stroke-[2.5] ${favorited ? 'fill-current' : ''}`} />
             </button>
           </div>
 
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight font-heading leading-tight">
+                {selectedRecipe.title}
+              </h2>
+              <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-stone-600 mt-1">
+                <span className="flex items-center space-x-1 bg-[#FFD166] text-stone-900 px-2.5 py-0.5 rounded-lg border border-stone-900">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{selectedRecipe.prep_time_minutes} minutes prep</span>
+                </span>
+                <span className="flex items-center space-x-1 bg-emerald-100 text-emerald-900 px-2.5 py-0.5 rounded-lg border border-stone-900">
+                  <DollarSign className="w-3.5 h-3.5" />
+                  <span>Budget level: {'$'.repeat(selectedRecipe.cost_level)}</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Owner Actions */}
+            {isOwner && (
+              <div className="flex items-center space-x-2 pt-2 sm:pt-0">
+                <button
+                  onClick={() => openRecipeForm(selectedRecipe)}
+                  className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-amber-100 border border-stone-900 text-stone-900 text-xs font-bold hover:bg-amber-200 transition-all shadow-[2px_2px_0px_0px_#1C1917]"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Edit</span>
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-rose-100 border border-stone-900 text-rose-700 text-xs font-bold hover:bg-rose-200 transition-all shadow-[2px_2px_0px_0px_#1C1917]"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-1.5">
+            {selectedRecipe.diet_tags.map(tag => (
+              <span
+                key={tag}
+                className="text-xs font-extrabold px-3 py-1 rounded-full bg-[#F8F3EB] text-stone-900 border border-stone-900 shadow-[1px_1px_0px_0px_#1C1917]"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
 
-        {/* Recipe Header Body */}
-        <div className="p-6 space-y-6">
+        {/* Quick Assign to Planner Bar */}
+        <div className="bg-[#F8F3EB] border-2 border-stone-900 rounded-2xl p-4 space-y-2 shadow-[3px_3px_0px_0px_#1C1917]">
+          <span className="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
+            <CalendarPlus className="w-4 h-4 text-[#FF3B30]" />
+            Assign to Weekly Meal Plan:
+          </span>
           
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-amber-400 border border-amber-500/30">
-                <Clock className="w-3.5 h-3.5" />
-                <span>{selectedRecipe.prep_time_minutes} minutes prep</span>
-              </span>
-              <span className="flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-emerald-400 border border-emerald-500/30">
-                <DollarSign className="w-3.5 h-3.5" />
-                <span>Budget Level: {costSymbol}</span>
-              </span>
-              {selectedRecipe.is_user_submitted && (
-                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                  <ChefHat className="w-3 h-3" /> Student Submitted
-                </span>
-              )}
-            </div>
-
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight">
-              {selectedRecipe.title}
-            </h2>
-
-            {/* Diet Tags */}
-            <div className="flex flex-wrap gap-1.5 mt-3">
-              {selectedRecipe.diet_tags.map(tag => (
-                <span
-                  key={tag}
-                  className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Quick Add To Meal Plan Drawer Section inside Modal */}
-          {showPlannerSection && (
-            <div className="bg-slate-950 border border-amber-500/40 rounded-2xl p-4 space-y-3 animate-in fade-in duration-200">
-              <h4 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1">
-                <CalendarPlus className="w-4 h-4" /> Add to Weekly Meal Plan
-              </h4>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-slate-400 block mb-1">Select Day</label>
-                  <select
-                    value={selectedDay}
-                    onChange={(e) => setSelectedDay(Number(e.target.value))}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-medium text-slate-100 focus:outline-none focus:border-amber-500"
-                  >
-                    {DAYS_FULL.map((day, idx) => (
-                      <option key={day} value={idx}>{day}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold text-slate-400 block mb-1">Select Meal Time</label>
-                  <select
-                    value={selectedMeal}
-                    onChange={(e) => setSelectedMeal(e.target.value as MealType)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-medium text-slate-100 capitalize focus:outline-none focus:border-amber-500"
-                  >
-                    {MEALS.map(meal => (
-                      <option key={meal} value={meal}>{meal}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-2 pt-1">
-                <button
-                  onClick={() => setShowPlannerSection(false)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAssignToMealPlan}
-                  className="px-4 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-bold hover:bg-amber-400 shadow-md"
-                >
-                  Confirm & Save Slot
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Ingredients Section with Checkboxes */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-bold text-slate-100 flex items-center justify-between border-b border-slate-800 pb-2">
-              <span>Ingredients</span>
-              <span className="text-xs font-normal text-slate-400">
-                {Object.values(checkedIngredients).filter(Boolean).length} / {selectedRecipe.ingredients.length} checked
-              </span>
-            </h3>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {selectedRecipe.ingredients.map((ing, idx) => {
-                const isChecked = Boolean(checkedIngredients[idx]);
-                return (
-                  <li
-                    key={idx}
-                    onClick={() => toggleIngredientCheck(idx)}
-                    className={`flex items-start space-x-2.5 p-2.5 rounded-xl cursor-pointer border transition-all ${
-                      isChecked
-                        ? 'bg-slate-950/60 border-slate-800 text-slate-500 line-through'
-                        : 'bg-slate-950 border-slate-800/80 text-slate-200 hover:border-slate-700'
-                    }`}
-                  >
-                    {isChecked ? (
-                      <CheckSquare className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
-                    ) : (
-                      <Square className="w-4 h-4 text-slate-500 mt-0.5 shrink-0" />
-                    )}
-                    <span className="text-xs font-medium leading-tight">{ing}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          {/* Preparation Steps Section */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-bold text-slate-100 border-b border-slate-800 pb-2">
-              Step-by-Step Instructions
-            </h3>
-            <ol className="space-y-3">
-              {selectedRecipe.steps.map((step, idx) => {
-                const isDone = Boolean(completedSteps[idx]);
-                return (
-                  <li
-                    key={idx}
-                    onClick={() => toggleStepCheck(idx)}
-                    className={`flex items-start space-x-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${
-                      isDone
-                        ? 'bg-slate-950/60 border-slate-800 text-slate-500'
-                        : 'bg-slate-950 border-slate-800 text-slate-200 hover:border-amber-500/40'
-                    }`}
-                  >
-                    <span
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                        isDone
-                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                          : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                      }`}
+          <div className="grid grid-cols-7 gap-1.5 pt-1">
+            {DAYS_FULL.map((dayName, dayIdx) => (
+              <div key={dayName} className="text-center space-y-1">
+                <span className="text-[10px] font-black text-stone-700">{dayName.slice(0, 3)}</span>
+                <div className="flex flex-col gap-1">
+                  {MEALS.map(meal => (
+                    <button
+                      key={meal.type}
+                      onClick={() => handleAssignMeal(dayIdx, meal.type)}
+                      title={`Add to ${dayName} ${meal.label}`}
+                      className="text-[9px] font-extrabold py-0.5 rounded bg-white hover:bg-[#FF3B30] hover:text-white border border-stone-900 transition-colors uppercase"
                     >
-                      {idx + 1}
-                    </span>
-                    <p className={`text-xs sm:text-sm font-normal leading-relaxed ${isDone ? 'line-through' : ''}`}>
-                      {step}
-                    </p>
-                  </li>
-                );
-              })}
-            </ol>
+                      {meal.type[0]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
+        </div>
 
+        {/* Ingredients Checklist Section */}
+        <div className="space-y-3">
+          <h3 className="font-extrabold text-lg text-stone-900 font-heading">
+            Ingredients ({selectedRecipe.ingredients.length})
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {selectedRecipe.ingredients.map((ing, idx) => {
+              const isChecked = Boolean(checkedIngredients[idx]);
+              return (
+                <div
+                  key={idx}
+                  onClick={() => toggleIngredient(idx)}
+                  className={`flex items-start space-x-2.5 p-3 rounded-xl border-2 border-stone-900 cursor-pointer transition-all ${
+                    isChecked
+                      ? 'bg-emerald-50 text-stone-500 line-through'
+                      : 'bg-white text-stone-900 hover:bg-[#F8F3EB]'
+                  }`}
+                >
+                  {isChecked ? (
+                    <CheckSquare className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0 stroke-[2.5]" />
+                  ) : (
+                    <Square className="w-4 h-4 text-stone-400 mt-0.5 shrink-0 stroke-[2.5]" />
+                  )}
+                  <span className="text-xs font-bold">{ing}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Step-by-Step Instructions */}
+        <div className="space-y-3">
+          <h3 className="font-extrabold text-lg text-stone-900 font-heading">
+            Step-by-Step Guide ({selectedRecipe.steps.length} steps)
+          </h3>
+          <div className="space-y-3">
+            {selectedRecipe.steps.map((step, idx) => {
+              const isDone = Boolean(completedSteps[idx]);
+              return (
+                <div
+                  key={idx}
+                  onClick={() => toggleStep(idx)}
+                  className={`flex items-start space-x-3 p-3.5 rounded-2xl border-2 border-stone-900 cursor-pointer transition-all ${
+                    isDone ? 'bg-stone-100 opacity-60' : 'bg-white shadow-[2px_2px_0px_0px_#1C1917]'
+                  }`}
+                >
+                  <span className="w-6 h-6 rounded-full bg-[#FF3B30] text-white font-extrabold text-xs flex items-center justify-center shrink-0 border border-stone-900">
+                    {idx + 1}
+                  </span>
+                  <p className={`text-xs font-semibold leading-relaxed ${isDone ? 'line-through text-stone-500' : 'text-stone-900'}`}>
+                    {step}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
       </div>

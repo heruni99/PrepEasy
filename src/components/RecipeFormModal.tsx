@@ -16,23 +16,23 @@ const DIET_TAG_OPTIONS: DietTag[] = [
   'Halal'
 ];
 
-const PRESET_IMAGES = [
-  'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=800&q=80',
+const SAMPLE_IMAGES = [
+  'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80',
   'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1618040996337-56904b7850b9?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1621996346565-e3d5d6281895?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80'
+  'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80'
 ];
 
 export const RecipeFormModal: React.FC = () => {
-  const { isRecipeFormOpen, editingRecipe, closeRecipeForm, addRecipe, updateRecipe } = useApp();
+  const { isRecipeFormOpen, editingRecipe, closeRecipeForm, addRecipe, updateRecipe, addToast } = useApp();
 
   const [title, setTitle] = useState('');
-  const [prepTime, setPrepTime] = useState<number>(15);
+  const [prepTime, setPrepTime] = useState(15);
   const [costLevel, setCostLevel] = useState<CostLevel>(1);
-  const [imageUrl, setImageUrl] = useState('');
-  const [selectedTags, setSelectedTags] = useState<DietTag[]>(['Budget']);
+  const [imageUrl, setImageUrl] = useState(SAMPLE_IMAGES[0]);
+  const [dietTags, setDietTags] = useState<DietTag[]>(['Budget']);
   const [ingredients, setIngredients] = useState<string[]>(['']);
   const [steps, setSteps] = useState<string[]>(['']);
 
@@ -42,15 +42,15 @@ export const RecipeFormModal: React.FC = () => {
       setPrepTime(editingRecipe.prep_time_minutes);
       setCostLevel(editingRecipe.cost_level);
       setImageUrl(editingRecipe.image_url);
-      setSelectedTags(editingRecipe.diet_tags);
-      setIngredients(editingRecipe.ingredients.length > 0 ? editingRecipe.ingredients : ['']);
-      setSteps(editingRecipe.steps.length > 0 ? editingRecipe.steps : ['']);
+      setDietTags(editingRecipe.diet_tags);
+      setIngredients(editingRecipe.ingredients);
+      setSteps(editingRecipe.steps);
     } else {
       setTitle('');
       setPrepTime(15);
       setCostLevel(1);
-      setImageUrl(PRESET_IMAGES[0]);
-      setSelectedTags(['Budget']);
+      setImageUrl(SAMPLE_IMAGES[Math.floor(Math.random() * SAMPLE_IMAGES.length)]);
+      setDietTags(['Budget']);
       setIngredients(['']);
       setSteps(['']);
     }
@@ -58,206 +58,208 @@ export const RecipeFormModal: React.FC = () => {
 
   if (!isRecipeFormOpen) return null;
 
-  const toggleTag = (tag: DietTag) => {
-    setSelectedTags(prev =>
+  const handleTagToggle = (tag: DietTag) => {
+    setDietTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
   };
 
-  const handleIngredientChange = (index: number, value: string) => {
+  const handleIngredientChange = (index: number, val: string) => {
     const updated = [...ingredients];
-    updated[index] = value;
+    updated[index] = val;
     setIngredients(updated);
   };
 
-  const addIngredientField = () => {
-    setIngredients(prev => [...prev, '']);
-  };
-
+  const addIngredientField = () => setIngredients(prev => [...prev, '']);
   const removeIngredientField = (index: number) => {
-    if (ingredients.length === 1) return;
-    setIngredients(prev => prev.filter((_, i) => i !== index));
+    if (ingredients.length > 1) {
+      setIngredients(prev => prev.filter((_, i) => i !== index));
+    }
   };
 
-  const handleStepChange = (index: number, value: string) => {
+  const handleStepChange = (index: number, val: string) => {
     const updated = [...steps];
-    updated[index] = value;
+    updated[index] = val;
     setSteps(updated);
   };
 
-  const addStepField = () => {
-    setSteps(prev => [...prev, '']);
-  };
-
+  const addStepField = () => setSteps(prev => [...prev, '']);
   const removeStepField = (index: number) => {
-    if (steps.length === 1) return;
-    setSteps(prev => prev.filter((_, i) => i !== index));
+    if (steps.length > 1) {
+      setSteps(prev => prev.filter((_, i) => i !== index));
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanedIngredients = ingredients.map(i => i.trim()).filter(Boolean);
-    const cleanedSteps = steps.map(s => s.trim()).filter(Boolean);
 
-    if (!title.trim()) return alert('Please enter a recipe title');
-    if (cleanedIngredients.length === 0) return alert('Please add at least 1 ingredient');
-    if (cleanedSteps.length === 0) return alert('Please add at least 1 instruction step');
+    const cleanIngredients = ingredients.map(i => i.trim()).filter(Boolean);
+    const cleanSteps = steps.map(s => s.trim()).filter(Boolean);
 
-    const finalImage = imageUrl.trim() || PRESET_IMAGES[0];
+    if (!title.trim() || cleanIngredients.length === 0 || cleanSteps.length === 0) {
+      addToast('Please fill in title, at least 1 ingredient, and 1 instruction step!', 'warning');
+      return;
+    }
+
+    const payload = {
+      title: title.trim(),
+      prep_time_minutes: Number(prepTime),
+      cost_level: costLevel,
+      image_url: imageUrl,
+      diet_tags: dietTags,
+      ingredients: cleanIngredients,
+      steps: cleanSteps,
+      is_user_submitted: true
+    };
 
     if (editingRecipe) {
-      updateRecipe({
-        ...editingRecipe,
-        title: title.trim(),
-        prep_time_minutes: Number(prepTime),
-        cost_level: costLevel,
-        image_url: finalImage,
-        diet_tags: selectedTags,
-        ingredients: cleanedIngredients,
-        steps: cleanedSteps
-      });
+      await updateRecipe({ ...payload, id: editingRecipe.id, owner_id: editingRecipe.owner_id });
+      addToast(`Updated "${title}"!`, 'success');
     } else {
-      addRecipe({
-        title: title.trim(),
-        prep_time_minutes: Number(prepTime),
-        cost_level: costLevel,
-        image_url: finalImage,
-        diet_tags: selectedTags,
-        ingredients: cleanedIngredients,
-        steps: cleanedSteps,
-        is_user_submitted: true
-      });
+      await addRecipe(payload);
+      addToast(`Created recipe "${title}"!`, 'success');
     }
+
+    closeRecipeForm();
   };
 
   return (
     <div
       onClick={closeRecipeForm}
-      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden text-slate-100"
+        className="bg-[#FFFDF9] border-2 border-stone-900 rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1C1917] relative text-stone-900 space-y-6 max-h-[90vh] overflow-y-auto"
       >
-        
-        {/* Header */}
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
-              <ChefHat className="w-4 h-4" />
-            </div>
-            <h3 className="text-lg font-extrabold text-slate-100">
-              {editingRecipe ? 'Edit Recipe' : 'Add New Student Recipe'}
-            </h3>
+        {/* Close Button */}
+        <button
+          onClick={closeRecipeForm}
+          className="absolute top-4 right-4 p-1.5 rounded-xl bg-[#F8F3EB] border-2 border-stone-900 text-stone-800 hover:bg-[#FF3B30] hover:text-white transition-all shadow-[2px_2px_0px_0px_#1C1917]"
+        >
+          <X className="w-5 h-5 stroke-[2.5]" />
+        </button>
+
+        {/* Modal Title */}
+        <div className="flex items-center space-x-2">
+          <div className="w-10 h-10 rounded-2xl bg-[#FF3B30] text-white flex items-center justify-center border-2 border-stone-900 shadow-[2px_2px_0px_0px_#1C1917]">
+            <ChefHat className="w-5 h-5 stroke-[2.5]" />
           </div>
-          <button
-            onClick={closeRecipeForm}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div>
+            <h3 className="text-xl font-black text-stone-900 font-heading">
+              {editingRecipe ? 'Edit Student Recipe' : 'Add New Student Recipe'}
+            </h3>
+            <p className="text-xs text-stone-600 font-bold">
+              Share your dorm hack, 1-pot dish, or budget creation
+            </p>
+          </div>
         </div>
 
-        {/* Form Scroll Area */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
+        <form onSubmit={handleSubmit} className="space-y-5">
           
-          {/* Title */}
+          {/* Title Input */}
           <div>
-            <label className="text-xs font-bold text-slate-300 block mb-1">Recipe Title *</label>
+            <label className="text-xs font-black text-stone-900 block mb-1">Recipe Title *</label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. 10-Minute Garlic Butter Pasta"
-              className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
+              className="w-full bg-[#F8F3EB] border-2 border-stone-900 focus:border-[#FF3B30] rounded-2xl px-3.5 py-2.5 text-xs text-stone-900 font-bold placeholder-stone-500 focus:outline-none shadow-[2px_2px_0px_0px_#1C1917]"
             />
           </div>
 
-          {/* Time & Cost Level Row */}
+          {/* Prep Time & Budget Level */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
             <div>
-              <label className="text-xs font-bold text-slate-300 flex items-center gap-1 mb-1">
-                <Clock className="w-3.5 h-3.5 text-amber-400" /> Prep Time (minutes) *
+              <label className="text-xs font-black text-stone-900 flex items-center gap-1 mb-1">
+                <Clock className="w-3.5 h-3.5 text-stone-700" />
+                <span>Prep Time (minutes) *</span>
               </label>
               <input
                 type="number"
-                min="1"
-                max="180"
+                min={1}
+                max={120}
                 required
                 value={prepTime}
                 onChange={(e) => setPrepTime(Number(e.target.value))}
-                className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none"
+                className="w-full bg-[#F8F3EB] border-2 border-stone-900 focus:border-[#FF3B30] rounded-2xl px-3.5 py-2.5 text-xs text-stone-900 font-bold focus:outline-none shadow-[2px_2px_0px_0px_#1C1917]"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-300 flex items-center gap-1 mb-1">
-                <DollarSign className="w-3.5 h-3.5 text-emerald-400" /> Cost Level *
+              <label className="text-xs font-black text-stone-900 flex items-center gap-1 mb-1">
+                <DollarSign className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Cost Level *</span>
               </label>
-              <div className="grid grid-cols-3 gap-2">
-                {[1, 2, 3].map(level => (
+              <div className="flex bg-[#F8F3EB] p-1 rounded-2xl border-2 border-stone-900 shadow-[2px_2px_0px_0px_#1C1917]">
+                {([1, 2, 3] as CostLevel[]).map(lvl => (
                   <button
-                    key={level}
+                    key={lvl}
                     type="button"
-                    onClick={() => setCostLevel(level as CostLevel)}
-                    className={`py-2 rounded-xl text-xs font-bold transition-all ${
-                      costLevel === level
-                        ? 'bg-emerald-500 text-slate-950 shadow-md'
-                        : 'bg-slate-950 border border-slate-800 text-slate-300 hover:bg-slate-800'
+                    onClick={() => setCostLevel(lvl)}
+                    className={`flex-1 py-1 rounded-xl text-xs font-black transition-all ${
+                      costLevel === lvl
+                        ? 'bg-[#06D6A0] text-stone-950 border border-stone-900 shadow-[1px_1px_0px_0px_#1C1917]'
+                        : 'text-stone-700 hover:text-stone-900'
                     }`}
                   >
-                    {'$'.repeat(level)} {level === 1 ? '(Cheap)' : level === 2 ? '(Medium)' : '(Splurge)'}
+                    {'$'.repeat(lvl)} ({lvl === 1 ? 'Cheap' : lvl === 2 ? 'Medium' : 'Splurge'})
                   </button>
                 ))}
               </div>
             </div>
+
           </div>
 
-          {/* Image URL & Presets */}
+          {/* Image Presets Selector */}
           <div>
-            <label className="text-xs font-bold text-slate-300 flex items-center gap-1 mb-1">
-              <Image className="w-3.5 h-3.5 text-amber-400" /> Image Cover URL
+            <label className="text-xs font-black text-stone-900 flex items-center gap-1 mb-1">
+              <Image className="w-3.5 h-3.5 text-stone-700" />
+              <span>Image Cover URL</span>
             </label>
             <input
               type="url"
+              required
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
               placeholder="https://images.unsplash.com/..."
-              className="w-full bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none mb-2"
+              className="w-full bg-[#F8F3EB] border-2 border-stone-900 focus:border-[#FF3B30] rounded-2xl px-3.5 py-2 text-xs text-stone-900 font-bold focus:outline-none shadow-[2px_2px_0px_0px_#1C1917] mb-2"
             />
-
+            
             <div className="flex items-center space-x-2 overflow-x-auto pb-1">
-              <span className="text-[11px] font-semibold text-slate-500 shrink-0">Quick Presets:</span>
-              {PRESET_IMAGES.map((img, i) => (
+              <span className="text-[10px] font-extrabold text-stone-500 shrink-0">Presets:</span>
+              {SAMPLE_IMAGES.map((img, idx) => (
                 <img
-                  key={i}
+                  key={idx}
                   src={img}
-                  alt=""
+                  alt={`Preset ${idx}`}
                   onClick={() => setImageUrl(img)}
-                  className={`w-9 h-9 rounded-lg object-cover cursor-pointer border-2 transition-all ${
-                    imageUrl === img ? 'border-amber-500 scale-105' : 'border-transparent opacity-60 hover:opacity-100'
+                  className={`w-9 h-9 rounded-xl object-cover border-2 cursor-pointer transition-all shrink-0 ${
+                    imageUrl === img ? 'border-[#FF3B30] scale-110 shadow-[2px_2px_0px_0px_#1C1917]' : 'border-stone-900 opacity-60 hover:opacity-100'
                   }`}
                 />
               ))}
             </div>
           </div>
 
-          {/* Diet Tags Selector */}
+          {/* Dietary Tags Pill Selection */}
           <div>
-            <label className="text-xs font-bold text-slate-300 block mb-1.5">Dietary & Category Tags</label>
+            <label className="text-xs font-black text-stone-900 block mb-1">Dietary & Category Tags</label>
             <div className="flex flex-wrap gap-1.5">
               {DIET_TAG_OPTIONS.map(tag => {
-                const isSelected = selectedTags.includes(tag);
+                const isSelected = dietTags.includes(tag);
                 return (
                   <button
                     key={tag}
                     type="button"
-                    onClick={() => toggleTag(tag)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                    onClick={() => handleTagToggle(tag)}
+                    className={`px-3 py-1 rounded-full text-[11px] font-extrabold transition-all border-2 border-stone-900 ${
                       isSelected
-                        ? 'bg-amber-500 text-slate-950 font-bold'
-                        : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
+                        ? 'bg-[#FF3B30] text-white shadow-[2px_2px_0px_0px_#1C1917]'
+                        : 'bg-[#F8F3EB] text-stone-800 hover:bg-stone-200'
                     }`}
                   >
                     {tag}
@@ -267,100 +269,92 @@ export const RecipeFormModal: React.FC = () => {
             </div>
           </div>
 
-          {/* Dynamic Ingredients List */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-bold text-slate-300">Ingredients *</label>
+          {/* Dynamic Ingredients Input */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-black text-stone-900">Ingredients *</label>
               <button
                 type="button"
                 onClick={addIngredientField}
-                className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                className="text-xs font-black text-[#FF3B30] hover:underline flex items-center gap-1"
               >
-                <Plus className="w-3.5 h-3.5" /> Add Ingredient
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Ingredient</span>
               </button>
             </div>
-            <div className="space-y-2">
-              {ingredients.map((ing, idx) => (
-                <div key={idx} className="flex items-center space-x-2">
-                  <input
-                    type="text"
-                    value={ing}
-                    onChange={(e) => handleIngredientChange(idx, e.target.value)}
-                    placeholder={`Ingredient ${idx + 1} (e.g. 1 tbsp soy sauce)`}
-                    className="flex-1 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none"
-                  />
-                  {ingredients.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeIngredientField(idx)}
-                      className="p-2 text-slate-500 hover:text-rose-400"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
+
+            {ingredients.map((ing, idx) => (
+              <div key={idx} className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  required
+                  value={ing}
+                  onChange={(e) => handleIngredientChange(idx, e.target.value)}
+                  placeholder={`Ingredient ${idx + 1} (e.g. 1 tbsp soy sauce)`}
+                  className="flex-1 bg-[#F8F3EB] border-2 border-stone-900 focus:border-[#FF3B30] rounded-2xl px-3 py-1.5 text-xs text-stone-900 font-bold focus:outline-none shadow-[2px_2px_0px_0px_#1C1917]"
+                />
+                {ingredients.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeIngredientField(idx)}
+                    className="p-1.5 rounded-xl bg-rose-100 border border-stone-900 text-rose-700 hover:bg-rose-200"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            ))}
           </div>
 
-          {/* Dynamic Steps List */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-bold text-slate-300">Instructions / Steps *</label>
+          {/* Dynamic Steps Input */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-black text-stone-900">Instructions / Steps *</label>
               <button
                 type="button"
                 onClick={addStepField}
-                className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                className="text-xs font-black text-[#FF3B30] hover:underline flex items-center gap-1"
               >
-                <Plus className="w-3.5 h-3.5" /> Add Step
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Step</span>
               </button>
             </div>
-            <div className="space-y-2">
-              {steps.map((step, idx) => (
-                <div key={idx} className="flex items-start space-x-2">
-                  <span className="w-6 h-6 rounded-full bg-slate-800 text-slate-400 text-xs font-bold flex items-center justify-center shrink-0 mt-1">
-                    {idx + 1}
-                  </span>
-                  <textarea
-                    rows={2}
-                    value={step}
-                    onChange={(e) => handleStepChange(idx, e.target.value)}
-                    placeholder={`Step ${idx + 1} instructions...`}
-                    className="flex-1 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none resize-none"
-                  />
-                  {steps.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeStepField(idx)}
-                      className="p-2 text-slate-500 hover:text-rose-400"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
+
+            {steps.map((step, idx) => (
+              <div key={idx} className="flex items-center space-x-2">
+                <span className="w-5 h-5 rounded-full bg-[#FF3B30] text-white text-[10px] font-black flex items-center justify-center shrink-0 border border-stone-900">
+                  {idx + 1}
+                </span>
+                <input
+                  type="text"
+                  required
+                  value={step}
+                  onChange={(e) => handleStepChange(idx, e.target.value)}
+                  placeholder={`Step ${idx + 1} instructions...`}
+                  className="flex-1 bg-[#F8F3EB] border-2 border-stone-900 focus:border-[#FF3B30] rounded-2xl px-3 py-1.5 text-xs text-stone-900 font-bold focus:outline-none shadow-[2px_2px_0px_0px_#1C1917]"
+                />
+                {steps.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeStepField(idx)}
+                    className="p-1.5 rounded-xl bg-rose-100 border border-stone-900 text-rose-700 hover:bg-rose-200"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            ))}
           </div>
 
-          {/* Submit Action */}
-          <div className="pt-4 border-t border-slate-800 flex items-center justify-end space-x-3">
-            <button
-              type="button"
-              onClick={closeRecipeForm}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-xs font-extrabold hover:from-amber-400 hover:to-orange-400 shadow-lg shadow-orange-500/20 active:scale-95 transition-all"
-            >
-              {editingRecipe ? 'Save Changes' : 'Publish Recipe'}
-            </button>
-          </div>
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full py-3 rounded-2xl bg-[#FF3B30] text-white font-extrabold text-xs border-2 border-stone-900 shadow-[4px_4px_0px_0px_#1C1917] hover:bg-[#E6302B] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all uppercase tracking-wider"
+          >
+            {editingRecipe ? 'Update Recipe' : 'Save & Publish Recipe'}
+          </button>
 
         </form>
-
       </div>
     </div>
   );

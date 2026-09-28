@@ -1,64 +1,60 @@
 import React from 'react';
 import { ChefHat, PlusCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { useAuth } from '../context/AuthContext';
 import { RecipeCard } from '../components/RecipeCard';
 
 export const MyRecipesPage: React.FC = () => {
-  const { user } = useAuth();
   const { recipes, openRecipeForm } = useApp();
-
-  const userId = user?.id || 'guest-user';
-  const myRecipes = recipes.filter(r => r.is_user_submitted || r.owner_id === userId);
+  const userRecipes = recipes.filter(r => r.is_user_submitted);
 
   return (
     <div className="space-y-8 pb-12">
       
       {/* Header Banner */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white border-2 border-stone-900 rounded-3xl p-6 sm:p-8 shadow-[4px_4px_0px_0px_#1C1917] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center space-x-2 text-emerald-400 text-xs font-bold mb-1">
+          <div className="flex items-center space-x-2 text-[#FF3B30] text-xs font-black mb-1">
             <ChefHat className="w-4 h-4" />
-            <span>My Creations</span>
+            <span>Student Creation Hub</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight">
-            User-Submitted Recipes
+          <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight font-heading">
+            My Submitted Recipes
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Manage your custom recipes, edit instructions, or add new budget creations.
+          <p className="text-xs font-bold text-stone-600 mt-0.5">
+            Manage your custom dorm hacks and budget recipes ({userRecipes.length} published)
           </p>
         </div>
 
         <button
           onClick={() => openRecipeForm()}
-          className="flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-extrabold text-xs hover:from-amber-400 hover:to-orange-400 shadow-lg shadow-orange-500/20 active:scale-95 transition-all"
+          className="flex items-center space-x-2 px-4 py-2.5 rounded-2xl bg-[#FF3B30] text-white text-xs font-extrabold border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] hover:bg-[#E6302B] transition-all"
         >
-          <PlusCircle className="w-4 h-4" />
-          <span>Add Custom Recipe</span>
+          <PlusCircle className="w-4 h-4 stroke-[2.5]" />
+          <span>Create New Recipe</span>
         </button>
       </div>
 
-      {/* Grid of My Recipes */}
-      {myRecipes.length > 0 ? (
+      {/* Grid */}
+      {userRecipes.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {myRecipes.map(recipe => (
+          {userRecipes.map(recipe => (
             <RecipeCard key={recipe.id} recipe={recipe} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 bg-slate-900/50 border border-slate-800 rounded-3xl p-8 space-y-4">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 mx-auto flex items-center justify-center text-emerald-400">
-            <ChefHat className="w-7 h-7" />
+        <div className="text-center py-16 bg-white border-2 border-stone-900 rounded-3xl p-8 space-y-4 shadow-[4px_4px_0px_0px_#1C1917] max-w-md mx-auto">
+          <div className="w-16 h-16 rounded-2xl bg-[#FFD166] border-2 border-stone-900 mx-auto flex items-center justify-center text-stone-900 shadow-[3px_3px_0px_0px_#1C1917]">
+            <ChefHat className="w-8 h-8 stroke-[2.5]" />
           </div>
-          <h3 className="text-xl font-bold text-slate-200">No custom recipes yet</h3>
-          <p className="text-xs text-slate-400 max-w-md mx-auto">
-            Got a great budget hack or dorm recipe? Click below to share your creation!
+          <h3 className="text-xl font-black text-stone-900 font-heading">No recipes created yet</h3>
+          <p className="text-xs font-bold text-stone-600">
+            Have a 5-minute ramen hack, mug cake, or microwave recipe? Share it with other students!
           </p>
           <button
             onClick={() => openRecipeForm()}
-            className="px-5 py-2.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold hover:bg-amber-400 shadow-md transition-colors"
+            className="px-5 py-2.5 rounded-2xl bg-[#FF3B30] text-white text-xs font-extrabold border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] hover:bg-[#E6302B] transition-all"
           >
-            Create Your First Recipe
+            Submit First Recipe
           </button>
         </div>
       )}

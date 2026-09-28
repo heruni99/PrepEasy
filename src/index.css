@@ -2,73 +2,85 @@
 
 @layer base {
   :root {
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --font-heading: 'Fredoka', cursive, sans-serif;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --color-bg: #F8F3EB;
+    --color-card: #FFFFFF;
+    --color-text: #1C1917;
+    --color-pop-red: #FF3B30;
   }
   
   body {
     font-family: var(--font-sans);
-    background-color: #0f172a;
-    color: #f8fafc;
+    background-color: var(--color-bg);
+    color: var(--color-text);
     min-height: 100vh;
     overflow-x: hidden;
   }
+
+  h1, h2, h3, .font-heading {
+    font-family: var(--font-heading);
+    letter-spacing: -0.01em;
+  }
 }
 
-/* Custom scrollbar for clean UI */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #F8F3EB;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #D8CEBE;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #BDB09E;
 }
 
-/* Glassmorphism helpers */
-.glass-panel {
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* Retro Pop Utilities */
+.pop-card {
+  background-color: #FFFFFF;
+  border: 2px solid #1C1917;
+  border-radius: 1.25rem;
+  box-shadow: 3px 3px 0px 0px #1C1917;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.glass-card {
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: all 0.25s ease-in-out;
-}
-
-.glass-card:hover {
-  background: rgba(30, 41, 59, 0.85);
-  border-color: rgba(249, 115, 22, 0.3);
+.pop-card:hover {
   transform: translateY(-2px);
+  box-shadow: 5px 5px 0px 0px #1C1917;
 }
 
-/* Glowing accent effects */
-.glow-orange {
-  box-shadow: 0 0 25px -5px rgba(249, 115, 22, 0.3);
+.pop-shadow {
+  box-shadow: 3px 3px 0px 0px #1C1917;
 }
 
-.glow-emerald {
-  box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.3);
+.pop-shadow-lg {
+  box-shadow: 6px 6px 0px 0px #1C1917;
 }
 
-/* Animation utilities */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+.pop-shadow-sm {
+  box-shadow: 2px 2px 0px 0px #1C1917;
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.bg-pop-red {
+  background-color: #FF3B30;
+}
+
+.text-pop-red {
+  color: #FF3B30;
+}
+
+.bg-warm-cream {
+  background-color: #F8F3EB;
+}
+
+.bg-warm-card {
+  background-color: #FFFDF9;
 }

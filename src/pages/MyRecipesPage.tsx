@@ -15,13 +15,13 @@ export const MyRecipesPage: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2 text-[#FF3B30] text-xs font-black mb-1">
             <ChefHat className="w-4 h-4" />
-            <span>Student Creation Hub</span>
+            <span>Recipe Creation Hub</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight font-heading">
             My Submitted Recipes
           </h1>
           <p className="text-xs font-bold text-stone-600 mt-0.5">
-            Manage your custom dorm hacks and budget recipes ({userRecipes.length} published)
+            Manage your custom recipes and favorite meal creations ({userRecipes.length} published)
           </p>
         </div>
 
@@ -48,7 +48,7 @@ export const MyRecipesPage: React.FC = () => {
           </div>
           <h3 className="text-xl font-black text-stone-900 font-heading">No recipes created yet</h3>
           <p className="text-xs font-bold text-stone-600">
-            Have a 5-minute ramen hack, mug cake, or microwave recipe? Share it with other students!
+            Have a favorite family dish, quick weeknight dinner, or meal prep creation? Share it with the community!
           </p>
           <button
             onClick={() => openRecipeForm()}

@@ -147,10 +147,10 @@ export const RecipeFormModal: React.FC = () => {
           </div>
           <div>
             <h3 className="text-xl font-black text-stone-900 font-heading">
-              {editingRecipe ? 'Edit Student Recipe' : 'Add New Student Recipe'}
+              {editingRecipe ? 'Edit Recipe' : 'Add New Recipe'}
             </h3>
             <p className="text-xs text-stone-600 font-bold">
-              Share your dorm hack, 1-pot dish, or budget creation
+              Share your favorite dish, 1-pot dinner, or meal prep creation
             </p>
           </div>
         </div>

@@ -265,8 +265,8 @@ export const storageService = {
     if (stored) return JSON.parse(stored);
     const guestUser: User = {
       id: 'guest-user',
-      email: 'alex.student@prepeasy.edu',
-      name: 'Alex Chen (Student Guest)',
+      email: 'guest@prepeasy.app',
+      name: 'Guest Cook',
       is_demo: true
     };
     localStorage.setItem(USER_KEY, JSON.stringify(guestUser));

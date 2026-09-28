@@ -180,7 +180,7 @@ export const SEED_RECIPES: Recipe[] = [
   },
   {
     id: 'seed-8',
-    title: 'Dorm-Friendly Chocolate Chip Mug Cake',
+    title: '5-Minute Chocolate Chip Mug Cake',
     prep_time_minutes: 3,
     cost_level: 1,
     diet_tags: ['Vegetarian', 'Quick (<15m)', 'Budget'],
@@ -300,7 +300,7 @@ export const SEED_RECIPES: Recipe[] = [
   },
   {
     id: 'seed-13',
-    title: 'Lazy Student Lentil & Tomato Soup',
+    title: 'Hearty 1-Pot Lentil & Tomato Soup',
     prep_time_minutes: 25,
     cost_level: 1,
     diet_tags: ['Vegan', 'Meal Prep', 'Budget', 'One-Pot', 'Gluten-Free'],

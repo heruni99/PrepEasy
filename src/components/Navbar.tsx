@@ -30,7 +30,7 @@ export const Navbar: React.FC = () => {
               Prep<span className="text-[#FF3B30]">Easy</span>
             </span>
             <span className="text-[10px] font-bold text-stone-600 -mt-1 uppercase tracking-wider">
-              Student Meal Planner
+              Easy Recipe & Meal Planner
             </span>
           </div>
         </Link>
@@ -111,32 +111,39 @@ export const Navbar: React.FC = () => {
           </button>
 
           {/* User Profile / Auth State */}
-          {user ? (
-            <div className="flex items-center space-x-2 bg-[#FFD166] border-2 border-stone-900 rounded-xl px-3 py-1.5 shadow-[2px_2px_0px_0px_#1C1917]">
+          {user && !isGuest ? (
+            <div id="user-profile-badge" className="flex items-center space-x-2 bg-[#FFD166] border-2 border-stone-900 rounded-xl px-3 py-1.5 shadow-[2px_2px_0px_0px_#1C1917]">
               <div className="flex flex-col text-right">
-                <span className="text-xs font-extrabold text-stone-900 line-clamp-1">
+                <span id="user-display-name" className="text-xs font-extrabold text-stone-900 line-clamp-1">
                   {user.name || user.email.split('@')[0]}
                 </span>
                 <span className="text-[9px] font-bold text-stone-700 uppercase tracking-wider">
-                  {isGuest ? '⚡ Guest Student' : 'Member'}
+                  Member
                 </span>
               </div>
               <button
                 onClick={logout}
                 title="Log Out"
-                className="p-1 rounded-lg text-stone-900 hover:bg-stone-900/10 transition-colors"
+                id="nav-logout-btn"
+                className="p-1 rounded-lg text-stone-900 hover:bg-stone-900/10 transition-colors cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
           ) : (
-            <button
-              onClick={openAuthModal}
-              className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-[#F8F3EB] border-2 border-stone-900 text-stone-900 text-xs font-extrabold hover:bg-stone-200/70 transition-all shadow-[2px_2px_0px_0px_#1C1917]"
-            >
-              <UserCheck className="w-4 h-4" />
-              <span>Sign In</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <div className="hidden sm:flex items-center px-2.5 py-1 rounded-xl bg-amber-100 border border-amber-300 text-stone-700 text-[10px] font-bold">
+                <span>⚡ Guest Mode</span>
+              </div>
+              <button
+                onClick={openAuthModal}
+                id="nav-auth-btn"
+                className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-[#FFD166] border-2 border-stone-900 text-stone-900 text-xs font-extrabold hover:bg-[#F3C450] transition-all shadow-[2px_2px_0px_0px_#1C1917] cursor-pointer"
+              >
+                <UserCheck className="w-4 h-4" />
+                <span>Sign In / Up</span>
+              </button>
+            </div>
           )}
 
         </div>

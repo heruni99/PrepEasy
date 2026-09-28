@@ -51,13 +51,13 @@ export default function App() {
                     <UtensilsCrossed className="w-4 h-4" />
                   </div>
                   <span className="font-extrabold text-sm text-slate-200">PrepEasy</span>
-                  <span className="text-slate-500">— Student Recipe & Weekly Meal Planner</span>
+                  <span className="text-slate-500">— Easy Recipe & Weekly Meal Planner</span>
                 </div>
 
                 <div className="flex items-center space-x-1 text-slate-400">
                   <span>Made with</span>
                   <Heart className="w-3.5 h-3.5 text-rose-500 fill-current" />
-                  <span>for students worldwide • Powered by React + TypeScript + Supabase</span>
+                  <span>for home cooks & food lovers everywhere • Powered by React + TypeScript + Supabase</span>
                 </div>
               </div>
             </footer>

@@ -124,7 +124,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
         {recipe.is_user_submitted && (
           <div className="absolute bottom-2 left-2 bg-[#06D6A0] text-stone-950 text-[10px] font-black px-2 py-0.5 rounded-lg border border-stone-900 flex items-center space-x-1 shadow-[1px_1px_0px_0px_#1C1917]">
             <ChefHat className="w-3 h-3" />
-            <span>Student Created</span>
+            <span>Community Recipe</span>
           </div>
         )}
       </div>

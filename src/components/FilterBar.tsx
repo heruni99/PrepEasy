@@ -143,7 +143,7 @@ export const FilterBar: React.FC = () => {
       {/* Results Count Bar */}
       <div className="flex items-center justify-between text-[11px] text-stone-600 font-bold pt-1">
         <span>
-          Showing <span className="text-[#FF3B30] font-black">{filteredRecipes.length}</span> of {recipes.length} student recipes
+          Showing <span className="text-[#FF3B30] font-black">{filteredRecipes.length}</span> of {recipes.length} recipes
         </span>
         {hasActiveFilters && <span className="text-amber-800 italic">Filters active</span>}
       </div>

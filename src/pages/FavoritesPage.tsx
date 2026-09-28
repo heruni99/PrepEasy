@@ -19,7 +19,7 @@ export const FavoritesPage: React.FC = () => {
             <span>Saved Collection</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight font-heading">
-            Your Favorite Student Recipes
+            Your Favorite Recipes
           </h1>
           <p className="text-xs font-bold text-stone-600 mt-0.5">
             Quick access to the meals you love most ({favoriteRecipes.length} saved)
@@ -48,7 +48,7 @@ export const FavoritesPage: React.FC = () => {
             className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-2xl bg-[#FF3B30] text-white text-xs font-extrabold border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] hover:bg-[#E6302B] transition-all"
           >
             <Utensils className="w-4 h-4" />
-            <span>Browse Student Recipes</span>
+            <span>Browse All Recipes</span>
           </Link>
         </div>
       )}

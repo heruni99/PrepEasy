@@ -17,15 +17,15 @@ export const HomePage: React.FC = () => {
           
           <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-white text-stone-900 border-2 border-stone-900 text-xs font-black shadow-[2px_2px_0px_0px_#1C1917]">
             <Sparkles className="w-3.5 h-3.5 text-[#FF3B30] fill-current" />
-            <span>Student-Friendly & Budget Approved</span>
+            <span>Quick, Delicious & Budget-Friendly</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight font-heading">
-            Delicious Meals on a <span className="bg-[#FFD166] text-stone-900 px-2 py-0.5 rounded-2xl border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] inline-block -rotate-1">Student Budget</span>
+            Delicious Everyday Meals <span className="bg-[#FFD166] text-stone-900 px-2 py-0.5 rounded-2xl border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] inline-block -rotate-1">Made Easy</span>
           </h1>
 
           <p className="text-sm sm:text-base font-bold text-stone-100 leading-relaxed max-w-xl">
-            Discover 10-minute ramens, 1-pot pastas, high-protein meal prep bowls, and dorm mug cakes designed for busy college schedules.
+            Discover quick 15-minute dinners, 1-pot pastas, high-protein meal prep bowls, and wholesome recipes designed for busy everyday schedules.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -39,7 +39,7 @@ export const HomePage: React.FC = () => {
             </div>
             <div className="flex items-center space-x-2 bg-white/90 text-stone-900 px-3 py-1 rounded-xl border border-stone-900 text-xs font-black">
               <span className="w-2.5 h-2.5 rounded-full bg-orange-400"></span>
-              <span>Zero fancy equipment</span>
+              <span>Everyday ingredients</span>
             </div>
           </div>
 

@@ -4,6 +4,7 @@ import type { Recipe, MealType } from '../types';
 import { useApp } from '../context/AppContext';
 import { formatPriceRange } from '../config/currency';
 import { triggerHeartBurst } from '../utils/confetti';
+import { migrateLegacyId } from '../services/storageService';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -15,7 +16,9 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   const { favorites, toggleFavorite, setMealPlanSlot, openRecipeDetails, addToast, currency } = useApp();
   const [showPlannerMenu, setShowPlannerMenu] = useState(false);
 
-  const favorited = favorites.includes(recipe.id);
+  const favorited = favorites.some(
+    favId => favId === recipe.id || migrateLegacyId(favId) === migrateLegacyId(recipe.id)
+  );
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();

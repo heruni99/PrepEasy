@@ -5,6 +5,7 @@ import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { formatPricePerServing, COST_TIERS } from '../config/currency';
 import { triggerConfetti, triggerHeartBurst } from '../utils/confetti';
+import { migrateLegacyId } from '../services/storageService';
 
 const DAYS_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const MEALS: { type: MealType; label: string }[] = [
@@ -23,7 +24,9 @@ export const RecipeDetailModal: React.FC = () => {
 
   if (!selectedRecipe) return null;
 
-  const favorited = favorites.includes(selectedRecipe.id);
+  const favorited = favorites.some(
+    favId => favId === selectedRecipe.id || migrateLegacyId(favId) === migrateLegacyId(selectedRecipe.id)
+  );
   const isOwner = selectedRecipe.owner_id === user?.id || (selectedRecipe.is_user_submitted && user?.is_demo);
 
   const toggleIngredient = (idx: number) => {
@@ -94,7 +97,7 @@ export const RecipeDetailModal: React.FC = () => {
               className={`absolute top-4 right-4 w-11 h-11 rounded-2xl border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] flex items-center justify-center transition-all cursor-pointer group/fav ${
                 favorited ? 'bg-rose-50 text-[#FF3B30] hover:scale-105 active:scale-95' : 'bg-white text-stone-800 hover:text-[#FF3B30] active:scale-95'
               }`}
-              title={favorited ? 'Favorited' : 'Add to favorites'}
+              title={favorited ? 'Remove from favorites' : 'Add to favorites'}
             >
               <Heart className={`w-5 h-5 stroke-[2.5] transition-transform ${favorited ? 'fill-current scale-110' : 'group-hover/fav:scale-115'}`} />
             </button>

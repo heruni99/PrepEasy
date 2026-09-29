@@ -15,6 +15,10 @@ for (let i = 1; i <= 22; i++) {
   LEGACY_SEED_MAP[`seed-${i}`] = `a1b2c3d4-${pad4}-4000-8000-0000000000${pad2}`;
 }
 
+export const isValidUuid = (id: string): boolean => {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+};
+
 export const normalizeTitle = (title: string): string => {
   return title.toLowerCase().trim().replace(/\s+/g, ' ');
 };
@@ -178,7 +182,7 @@ export const storageService = {
   // FAVORITES
   getFavorites: async (userId: string): Promise<Favorite[]> => {
     initializeStorage();
-    if (isSupabaseConfigured && supabase) {
+    if (isSupabaseConfigured && supabase && isValidUuid(userId)) {
       try {
         const { data, error } = await supabase
           .from('favorites')
@@ -224,23 +228,39 @@ export const storageService = {
     if (modified) {
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(uniqueFavs));
     }
-    return uniqueFavs.filter(f => f.user_id === userId || userId === 'guest-user');
+    return uniqueFavs.filter(f => f.user_id === userId || (userId === 'guest-user' && (!f.user_id || f.user_id === 'guest-user')));
   },
 
   toggleFavorite: async (userId: string, recipeId: string): Promise<boolean> => {
     initializeStorage();
     const normalizedRecipeId = migrateLegacyId(recipeId);
-    const favorites = await storageService.getFavorites(userId);
-    const existing = favorites.find(f => migrateLegacyId(f.recipe_id) === normalizedRecipeId);
+    
+    // Always work directly on stored favorites array
+    const local = localStorage.getItem(FAVORITES_KEY);
+    let allFavs: Favorite[] = local ? JSON.parse(local) : [];
 
-    if (existing) {
-      if (isSupabaseConfigured && supabase) {
+    // Normalize any legacy IDs in all stored favorites
+    allFavs = allFavs.map(f => ({
+      ...f,
+      recipe_id: migrateLegacyId(f.recipe_id)
+    }));
+
+    const isUserMatch = (f: Favorite) => f.user_id === userId || (userId === 'guest-user' && (!f.user_id || f.user_id === 'guest-user'));
+    const isRecipeMatch = (f: Favorite) => migrateLegacyId(f.recipe_id) === normalizedRecipeId;
+
+    const existingIndex = allFavs.findIndex(f => isUserMatch(f) && isRecipeMatch(f));
+
+    if (existingIndex !== -1) {
+      const existing = allFavs[existingIndex];
+      // REMOVE: Filter out all matching entries (including duplicates if any)
+      allFavs = allFavs.filter(f => !(isUserMatch(f) && isRecipeMatch(f)));
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(allFavs));
+
+      if (isSupabaseConfigured && supabase && isValidUuid(userId)) {
         try {
-          if (existing.id) {
-            // Delete by real Postgres UUID if we have one
+          if (existing.id && isValidUuid(existing.id)) {
             await supabase.from('favorites').delete().eq('id', existing.id);
           } else {
-            // Fallback: delete by the composite key (user + recipe)
             await supabase.from('favorites')
               .delete()
               .eq('user_id', userId)
@@ -250,46 +270,42 @@ export const storageService = {
           console.warn('Supabase favorite delete error', err);
         }
       }
-      const updated = favorites.filter(f => migrateLegacyId(f.recipe_id) !== normalizedRecipeId);
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
-      return false; // Removed from favorites
+
+      return false; // Removed from favorites!
     } else {
-      if (isSupabaseConfigured && supabase) {
+      // ADD to favorites
+      let newFav: Favorite = {
+        id: `fav-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        user_id: userId,
+        recipe_id: normalizedRecipeId,
+        created_at: new Date().toISOString()
+      };
+
+      if (isSupabaseConfigured && supabase && isValidUuid(userId)) {
         try {
-          // Never send `id` — let Postgres auto-generate the UUID
           const { data, error } = await supabase
             .from('favorites')
             .insert([{ user_id: userId, recipe_id: normalizedRecipeId }])
             .select()
             .single();
           if (!error && data) {
-            // Use the Postgres-returned row (with real UUID) for localStorage too
-            const updated = [...favorites, data as Favorite];
-            localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
-            return true;
+            newFav = data as Favorite;
           }
-          console.warn('Supabase favorite insert error', error);
         } catch (err) {
           console.warn('Supabase favorite insert error', err);
         }
       }
-      // localStorage-only fallback (no Supabase) — local id is fine here
-      const newFav: Favorite = {
-        id: `fav-${Date.now()}`,
-        user_id: userId,
-        recipe_id: normalizedRecipeId,
-        created_at: new Date().toISOString()
-      };
-      const updated = [...favorites, newFav];
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
-      return true; // Added to favorites
+
+      allFavs.push(newFav);
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(allFavs));
+      return true; // Added to favorites!
     }
   },
 
   // MEAL PLAN
   getMealPlan: async (userId: string): Promise<MealPlanEntry[]> => {
     initializeStorage();
-    if (isSupabaseConfigured && supabase) {
+    if (isSupabaseConfigured && supabase && isValidUuid(userId)) {
       try {
         const { data, error } = await supabase
           .from('meal_plan_entries')
@@ -324,7 +340,7 @@ export const storageService = {
     if (modified) {
       localStorage.setItem(MEAL_PLAN_KEY, JSON.stringify(entries));
     }
-    return entries.filter(e => e.user_id === userId || userId === 'guest-user');
+    return entries.filter(e => e.user_id === userId || (userId === 'guest-user' && (!e.user_id || e.user_id === 'guest-user')));
   },
 
   setMealPlanSlot: async (
@@ -356,7 +372,7 @@ export const storageService = {
 
     localStorage.setItem(MEAL_PLAN_KEY, JSON.stringify(filtered));
 
-    if (isSupabaseConfigured && supabase) {
+    if (isSupabaseConfigured && supabase && isValidUuid(userId)) {
       try {
         if (!normalizedRecipeId) {
           await supabase.from('meal_plan_entries').delete().match({ user_id: userId, day_of_week: dayOfWeek, meal_type: mealType });
@@ -368,16 +384,16 @@ export const storageService = {
       }
     }
 
-    return filtered.filter(e => e.user_id === userId || userId === 'guest-user');
+    return filtered.filter(e => e.user_id === userId || (userId === 'guest-user' && (!e.user_id || e.user_id === 'guest-user')));
   },
 
   clearMealPlan: async (userId: string): Promise<void> => {
     initializeStorage();
     const allEntries: MealPlanEntry[] = JSON.parse(localStorage.getItem(MEAL_PLAN_KEY) || '[]');
-    const remaining = allEntries.filter(e => e.user_id !== userId && userId !== 'guest-user');
+    const remaining = allEntries.filter(e => e.user_id !== userId && !(userId === 'guest-user' && (!e.user_id || e.user_id === 'guest-user')));
     localStorage.setItem(MEAL_PLAN_KEY, JSON.stringify(remaining));
 
-    if (isSupabaseConfigured && supabase) {
+    if (isSupabaseConfigured && supabase && isValidUuid(userId)) {
       try {
         await supabase.from('meal_plan_entries').delete().eq('user_id', userId);
       } catch (err) {

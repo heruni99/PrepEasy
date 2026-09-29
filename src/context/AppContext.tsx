@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import type { Recipe, MealPlanEntry, FilterState, ToastMessage, MealType, Currency } from '../types';
-import { storageService } from '../services/storageService';
+import { storageService, migrateLegacyId } from '../services/storageService';
 import { useAuth } from './AuthContext';
 
 interface PlannerSlotSelection {
@@ -130,15 +130,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const toggleFavorite = async (recipeId: string) => {
-    const recipe = recipes.find(r => r.id === recipeId);
+    const canonicalId = migrateLegacyId(recipeId);
+    const recipe = recipes.find(r => r.id === canonicalId || r.id === recipeId);
     const title = recipe ? recipe.title : 'Recipe';
-    const isFav = await storageService.toggleFavorite(userId, recipeId);
+    const isFav = await storageService.toggleFavorite(userId, canonicalId);
 
     if (isFav) {
-      setFavorites(prev => [...prev, recipeId]);
+      setFavorites(prev => {
+        const cleaned = prev.filter(id => migrateLegacyId(id) !== canonicalId && id !== recipeId);
+        return [...cleaned, canonicalId];
+      });
       addToast(`Added "${title}" to your favorites!`, 'success');
     } else {
-      setFavorites(prev => prev.filter(id => id !== recipeId));
+      setFavorites(prev => prev.filter(id => migrateLegacyId(id) !== canonicalId && id !== recipeId));
       addToast(`Removed "${title}" from favorites`, 'info');
     }
   };
@@ -247,7 +251,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       // Only Favorites
       if (filterState.onlyFavorites) {
-        if (!favorites.includes(recipe.id)) return false;
+        if (!favorites.some(favId => favId === recipe.id || migrateLegacyId(favId) === migrateLegacyId(recipe.id))) return false;
       }
 
       // Only User Submitted Recipes

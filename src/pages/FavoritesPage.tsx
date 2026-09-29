@@ -3,10 +3,13 @@ import { Heart, Utensils } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { RecipeCard } from '../components/RecipeCard';
 import { Link } from 'react-router-dom';
+import { migrateLegacyId } from '../services/storageService';
 
 export const FavoritesPage: React.FC = () => {
   const { recipes, favorites } = useApp();
-  const favoriteRecipes = recipes.filter(r => favorites.includes(r.id));
+  const favoriteRecipes = recipes.filter(r =>
+    favorites.some(favId => favId === r.id || migrateLegacyId(favId) === migrateLegacyId(r.id))
+  );
 
   return (
     <div className="space-y-8 pb-12">

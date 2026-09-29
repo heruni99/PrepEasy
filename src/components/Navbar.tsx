@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { UtensilsCrossed, Calendar, Heart, PlusCircle, ChefHat, UserCheck, LogOut, Sparkles } from 'lucide-react';
+import { UtensilsCrossed, Calendar, Heart, PlusCircle, ChefHat, UserCheck, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 
@@ -188,7 +188,7 @@ export const Navbar: React.FC = () => {
                 title="You are currently browsing in Guest Mode. Click to sign in or create an account."
                 className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-[#F8F3EB] hover:bg-amber-100 border-2 border-stone-900 text-stone-900 text-xs font-black transition-all shadow-[2px_2px_0px_0px_#1C1917] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                 <span>Guest Mode</span>
               </button>
               <button

@@ -13,7 +13,7 @@ import { RecipeFormModal } from './components/RecipeFormModal';
 import { AuthModal } from './components/AuthModal';
 import { ToastContainer } from './components/ToastContainer';
 import { ScrollFeatures } from './components/ScrollFeatures';
-import { UtensilsCrossed, Heart } from 'lucide-react';
+import { Footer } from './components/Footer';
 
 export default function App() {
   return (
@@ -47,24 +47,8 @@ export default function App() {
             {/* Toast Notifications */}
             <ToastContainer />
 
-            {/* Modern Footer */}
-            <footer className="bg-slate-900/90 border-t border-slate-800/80 py-8 px-4 text-center text-xs text-slate-400 space-y-3">
-              <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 rounded-md bg-amber-500 flex items-center justify-center text-slate-950">
-                    <UtensilsCrossed className="w-4 h-4" />
-                  </div>
-                  <span className="font-extrabold text-sm text-slate-200">PrepEasy</span>
-                  <span className="text-slate-500">— Easy Recipe & Weekly Meal Planner</span>
-                </div>
-
-                <div className="flex items-center space-x-1 text-slate-400">
-                  <span>Made with</span>
-                  <Heart className="w-3.5 h-3.5 text-rose-500 fill-current" />
-                  <span>for home cooks & food lovers everywhere • Powered by React + TypeScript + Supabase</span>
-                </div>
-              </div>
-            </footer>
+            {/* Footer Component */}
+            <Footer />
 
           </div>
         </AppProvider>

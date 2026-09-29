@@ -57,16 +57,14 @@ RLS policies ensure users can only read/write their own favorites, meal plans, a
    ```
    (Without a `.env` file, the app falls back to a local-storage-only demo mode — no setup required to try it out.)
 
-4. Run the schema in your Supabase project's SQL Editor: see [`supabase/schema.sql`](./supabase/schema.sql)
+4. Run the schema and seed recipes in your Supabase project's SQL Editor:
+   - First run [`supabase/schema.sql`](./supabase/schema.sql) to create the tables and RLS policies.
+   - Then run [`supabase/seed.sql`](./supabase/seed.sql) to populate the 22 seed recipes into the database.
 
 5. Start the dev server:
    ```
    npm run dev
    ```
-
-## Known Issues
-
-- **Seed recipe favorites/planning:** the 15 pre-loaded demo recipes use placeholder string IDs (e.g. `seed-5`) rather than real UUIDs, so favoriting or meal-planning a *seed* recipe currently fails against the live Supabase database. User-submitted recipes are unaffected and work end-to-end. Fix in progress: migrating seed recipes into the Supabase `recipes` table with proper UUIDs.
 
 ## Roadmap / Stretch Goals
 

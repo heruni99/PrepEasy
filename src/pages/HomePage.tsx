@@ -1,5 +1,5 @@
 import React from 'react';
-import { Utensils, Sparkles, Dices, ArrowDown } from 'lucide-react';
+import { Utensils, Dices, ArrowDown } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { FilterBar } from '../components/FilterBar';
 import { RecipeCard } from '../components/RecipeCard';
@@ -32,8 +32,8 @@ export const HomePage: React.FC = () => {
         
         <div className="relative z-10 max-w-2xl space-y-4">
           
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-white text-stone-900 border-2 border-stone-900 text-xs font-black shadow-[2px_2px_0px_0px_#1C1917]">
-            <Sparkles className="w-3.5 h-3.5 text-[#FF3B30] fill-current animate-wiggle" />
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white text-stone-900 border-2 border-stone-900 text-xs font-black shadow-[2px_2px_0px_0px_#1C1917]">
+            <span className="w-2 h-2 rounded-full bg-[#FF3B30]"></span>
             <span>Quick, Delicious & Student Budget-Friendly</span>
           </div>
 

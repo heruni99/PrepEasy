@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Image, Clock, DollarSign, ChefHat } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import type { CostLevel, DietTag } from '../types';
+import { formatPriceRange, COST_TIERS } from '../config/currency';
 
 const DIET_TAG_OPTIONS: DietTag[] = [
   'Vegan',
@@ -26,7 +27,7 @@ const SAMPLE_IMAGES = [
 ];
 
 export const RecipeFormModal: React.FC = () => {
-  const { isRecipeFormOpen, editingRecipe, closeRecipeForm, addRecipe, updateRecipe, addToast } = useApp();
+  const { isRecipeFormOpen, editingRecipe, closeRecipeForm, addRecipe, updateRecipe, addToast, currency } = useApp();
 
   const [title, setTitle] = useState('');
   const [prepTime, setPrepTime] = useState(15);
@@ -194,19 +195,20 @@ export const RecipeFormModal: React.FC = () => {
                 <DollarSign className="w-3.5 h-3.5 text-emerald-700" />
                 <span>Cost Level *</span>
               </label>
-              <div className="flex bg-[#F8F3EB] p-1 rounded-2xl border-2 border-stone-900 shadow-[2px_2px_0px_0px_#1C1917]">
+              <div className="grid grid-cols-3 gap-1.5 bg-[#F8F3EB] p-1 rounded-2xl border-2 border-stone-900 shadow-[2px_2px_0px_0px_#1C1917]">
                 {([1, 2, 3] as CostLevel[]).map(lvl => (
                   <button
                     key={lvl}
                     type="button"
                     onClick={() => setCostLevel(lvl)}
-                    className={`flex-1 py-1 rounded-xl text-xs font-black transition-all ${
+                    className={`py-1.5 px-1 rounded-xl text-center transition-all cursor-pointer ${
                       costLevel === lvl
                         ? 'bg-[#06D6A0] text-stone-950 border border-stone-900 shadow-[1px_1px_0px_0px_#1C1917]'
-                        : 'text-stone-700 hover:text-stone-900'
+                        : 'text-stone-700 hover:text-stone-900 hover:bg-stone-200/60'
                     }`}
                   >
-                    {'$'.repeat(lvl)} ({lvl === 1 ? 'Cheap' : lvl === 2 ? 'Medium' : 'Splurge'})
+                    <span className="text-xs font-black block leading-tight">{formatPriceRange(lvl, currency)}</span>
+                    <span className="text-[9px] font-bold block opacity-80 leading-tight">{COST_TIERS[lvl]?.label}</span>
                   </button>
                 ))}
               </div>

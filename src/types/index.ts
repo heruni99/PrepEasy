@@ -1,4 +1,5 @@
 export type CostLevel = 1 | 2 | 3;
+export type Currency = 'LKR' | 'USD';
 
 export type DietTag = 
   | 'Vegan' 

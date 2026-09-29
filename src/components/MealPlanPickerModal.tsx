@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { X, Search, Clock, Plus, Trash2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { formatPriceRange } from '../config/currency';
 
 const DAYS_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 export const MealPlanPickerModal: React.FC = () => {
-  const { activePlannerSlot, closePlannerPicker, recipes, mealPlan, setMealPlanSlot, addToast } = useApp();
+  const { activePlannerSlot, closePlannerPicker, recipes, mealPlan, setMealPlanSlot, addToast, currency } = useApp();
   const [search, setSearch] = useState('');
 
   if (!activePlannerSlot) return null;
@@ -113,7 +114,9 @@ export const MealPlanPickerModal: React.FC = () => {
                       <Clock className="w-3 h-3 text-stone-700" />
                       <span>{r.prep_time_minutes}m</span>
                     </span>
-                    <span className="text-emerald-700">{'$'.repeat(r.cost_level)}</span>
+                    <span className="text-emerald-800 font-extrabold bg-emerald-50 px-1.5 py-0.5 rounded border border-stone-800">
+                      {formatPriceRange(r.cost_level, currency)}
+                    </span>
                   </div>
                 </div>
               </div>

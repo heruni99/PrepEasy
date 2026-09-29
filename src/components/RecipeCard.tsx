@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Clock, Heart, CalendarPlus, ChefHat } from 'lucide-react';
 import type { Recipe, MealType } from '../types';
 import { useApp } from '../context/AppContext';
+import { formatPriceRange } from '../config/currency';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -10,7 +11,7 @@ interface RecipeCardProps {
 const DAYS_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
-  const { favorites, toggleFavorite, setMealPlanSlot, openRecipeDetails, addToast } = useApp();
+  const { favorites, toggleFavorite, setMealPlanSlot, openRecipeDetails, addToast, currency } = useApp();
   const [showPlannerMenu, setShowPlannerMenu] = useState(false);
 
   const favorited = favorites.includes(recipe.id);
@@ -138,8 +139,12 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
           </h3>
 
           <div className="flex items-center space-x-2 mt-1">
-            <span className="text-xs font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md border border-stone-900">
-              {'$'.repeat(recipe.cost_level)}
+            <span 
+              className="text-xs font-black text-emerald-900 bg-emerald-100 px-2 py-0.5 rounded-lg border border-stone-900 shadow-[1px_1px_0px_0px_#1C1917]"
+              title={`Estimated cost: ${formatPriceRange(recipe.cost_level, currency)} per serving`}
+            >
+              {formatPriceRange(recipe.cost_level, currency)}
+              <span className="text-[10px] text-emerald-700 font-bold ml-1">/ serv</span>
             </span>
             <span className="text-[11px] font-bold text-stone-500">
               {recipe.ingredients.length} ingredients • {recipe.steps.length} steps

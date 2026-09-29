@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Calendar, Trash2, Plus, Clock, DollarSign, ShoppingBag, CheckSquare, Square, Utensils, Copy, Check } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import type { MealType, Recipe } from '../types';
+import { formatPriceRange, calculateWeeklyCost } from '../config/currency';
 
 const DAYS_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const MEALS: { type: MealType; label: string; icon: string }[] = [
@@ -11,7 +12,7 @@ const MEALS: { type: MealType; label: string; icon: string }[] = [
 ];
 
 export const PlannerPage: React.FC = () => {
-  const { recipes, mealPlan, openPlannerPicker, setMealPlanSlot, clearMealPlan, openRecipeDetails, addToast } = useApp();
+  const { recipes, mealPlan, openPlannerPicker, setMealPlanSlot, clearMealPlan, openRecipeDetails, addToast, currency } = useApp();
   const [activeTab, setActiveTab] = useState<'calendar' | 'shoppingList'>('calendar');
   const [checkedShoppingItems, setCheckedShoppingItems] = useState<Record<string, boolean>>({});
   const [copiedList, setCopiedList] = useState(false);
@@ -26,7 +27,7 @@ export const PlannerPage: React.FC = () => {
   // Calculate statistics
   const plannedRecipes = mealPlan.map(m => recipes.find(r => r.id === m.recipe_id)).filter(Boolean) as Recipe[];
   const totalPrepMinutes = plannedRecipes.reduce((acc, r) => acc + r.prep_time_minutes, 0);
-  const estimatedWeeklyCost = plannedRecipes.reduce((acc, r) => acc + (r.cost_level * 4.5), 0);
+  const weeklyCost = calculateWeeklyCost(plannedRecipes, currency);
 
   // Aggregate Shopping List
   const aggregatedIngredients = React.useMemo(() => {
@@ -130,7 +131,8 @@ export const PlannerPage: React.FC = () => {
           </div>
           <div>
             <span className="text-xs text-stone-600 font-extrabold">Est. Weekly Grocery Cost</span>
-            <p className="text-xl font-black text-emerald-700 font-heading">${estimatedWeeklyCost.toFixed(2)}</p>
+            <p className="text-xl font-black text-emerald-700 font-heading">{weeklyCost.amountFormatted}</p>
+            <span className="text-[10px] text-stone-500 font-bold block">{weeklyCost.subtext}</span>
           </div>
         </div>
 
@@ -188,7 +190,9 @@ export const PlannerPage: React.FC = () => {
                               </h4>
                               <div className="flex items-center space-x-2 text-[10px] text-stone-600 font-bold mt-1">
                                 <span>{recipe.prep_time_minutes}m</span>
-                                <span className="text-emerald-700">{'$'.repeat(recipe.cost_level)}</span>
+                                <span className="text-emerald-800 font-extrabold bg-emerald-50 px-1 py-0.5 rounded border border-stone-800">
+                                  {formatPriceRange(recipe.cost_level, currency)}
+                                </span>
                               </div>
                             </div>
 

@@ -8,7 +8,7 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const isGuest = user?.is_demo ?? false;
-  const { mealPlan, favorites, openRecipeForm, openAuthModal } = useApp();
+  const { mealPlan, favorites, openRecipeForm, openAuthModal, currency, setCurrency } = useApp();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -113,12 +113,45 @@ export const Navbar: React.FC = () => {
         </nav>
 
         {/* Right Action Bar */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
           
+          {/* Currency Toggle Switch (LKR / USD) */}
+          <div 
+            className="flex items-center bg-[#F8F3EB] p-0.5 sm:p-1 rounded-xl border-2 border-stone-900 shadow-[2px_2px_0px_0px_#1C1917]"
+            title="Toggle between Sri Lankan Rupees (LKR) and US Dollars (USD)"
+          >
+            <button
+              type="button"
+              id="currency-toggle-lkr"
+              onClick={() => setCurrency('LKR')}
+              className={`px-2 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                currency === 'LKR'
+                  ? 'bg-[#FF3B30] text-white border border-stone-900 shadow-[1px_1px_0px_0px_#1C1917]'
+                  : 'text-stone-700 hover:text-stone-950 hover:bg-stone-200/60'
+              }`}
+            >
+              <span className="sm:hidden">Rs</span>
+              <span className="hidden sm:inline">🇱🇰 LKR</span>
+            </button>
+            <button
+              type="button"
+              id="currency-toggle-usd"
+              onClick={() => setCurrency('USD')}
+              className={`px-2 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                currency === 'USD'
+                  ? 'bg-[#FF3B30] text-white border border-stone-900 shadow-[1px_1px_0px_0px_#1C1917]'
+                  : 'text-stone-700 hover:text-stone-950 hover:bg-stone-200/60'
+              }`}
+            >
+              <span className="sm:hidden">$</span>
+              <span className="hidden sm:inline">💵 USD</span>
+            </button>
+          </div>
+
           {/* Add Recipe CTA */}
           <button
             onClick={() => openRecipeForm()}
-            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#FF3B30] text-white text-xs font-extrabold border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] hover:bg-[#E6302B] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+            className="flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-xl bg-[#FF3B30] text-white text-xs font-extrabold border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] hover:bg-[#E6302B] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
           >
             <PlusCircle className="w-4 h-4 stroke-[2.5]" />
             <span className="hidden sm:inline">Add Recipe</span>

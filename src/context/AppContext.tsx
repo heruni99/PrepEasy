@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import type { Recipe, MealPlanEntry, FilterState, ToastMessage, MealType } from '../types';
+import type { Recipe, MealPlanEntry, FilterState, ToastMessage, MealType, Currency } from '../types';
 import { storageService } from '../services/storageService';
 import { useAuth } from './AuthContext';
 
@@ -38,6 +38,9 @@ interface AppContextType {
   closeAuthModal: () => void;
   openPlannerPicker: (dayOfWeek: number, mealType: MealType) => void;
   closePlannerPicker: () => void;
+  currency: Currency;
+  setCurrency: (currency: Currency) => void;
+  toggleCurrency: () => void;
   addToast: (message: string, type?: 'success' | 'info' | 'warning' | 'error') => void;
   removeToast: (id: string) => void;
   filteredRecipes: Recipe[];
@@ -71,6 +74,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isRecipeFormOpen, setIsRecipeFormOpen] = useState(false);
   const [isPlannerPickerOpen, setIsPlannerPickerOpen] = useState(false);
   const [activePlannerSlot, setActivePlannerSlot] = useState<PlannerSlotSelection | null>(null);
+  const [currency, setCurrencyState] = useState<Currency>(() => {
+    const saved = localStorage.getItem('prepeasy_currency');
+    return (saved === 'USD' || saved === 'LKR') ? saved : 'LKR';
+  });
+
+  const setCurrency = (c: Currency) => {
+    setCurrencyState(c);
+    localStorage.setItem('prepeasy_currency', c);
+  };
+
+  const toggleCurrency = () => {
+    setCurrencyState(prev => {
+      const next = prev === 'LKR' ? 'USD' : 'LKR';
+      localStorage.setItem('prepeasy_currency', next);
+      return next;
+    });
+  };
 
   const userId = user?.id || 'guest-user';
 
@@ -268,6 +288,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       closeAuthModal,
       openPlannerPicker,
       closePlannerPicker,
+      currency,
+      setCurrency,
+      toggleCurrency,
       addToast,
       removeToast,
       filteredRecipes

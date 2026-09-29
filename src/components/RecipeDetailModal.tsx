@@ -3,6 +3,7 @@ import { X, Clock, DollarSign, Heart, CalendarPlus, CheckSquare, Square, Trash2,
 import type { MealType } from '../types';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
+import { formatPricePerServing, COST_TIERS } from '../config/currency';
 
 const DAYS_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const MEALS: { type: MealType; label: string }[] = [
@@ -13,7 +14,7 @@ const MEALS: { type: MealType; label: string }[] = [
 
 export const RecipeDetailModal: React.FC = () => {
   const { user } = useAuth();
-  const { selectedRecipe, openRecipeDetails, favorites, toggleFavorite, setMealPlanSlot, deleteRecipe, openRecipeForm, addToast } = useApp();
+  const { selectedRecipe, openRecipeDetails, favorites, toggleFavorite, setMealPlanSlot, deleteRecipe, openRecipeForm, addToast, currency } = useApp();
   const closeRecipeDetails = () => openRecipeDetails(null);
   
   const [checkedIngredients, setCheckedIngredients] = useState<Record<number, boolean>>({});
@@ -90,9 +91,9 @@ export const RecipeDetailModal: React.FC = () => {
                   <Clock className="w-3.5 h-3.5" />
                   <span>{selectedRecipe.prep_time_minutes} minutes prep</span>
                 </span>
-                <span className="flex items-center space-x-1 bg-emerald-100 text-emerald-900 px-2.5 py-0.5 rounded-lg border border-stone-900">
-                  <DollarSign className="w-3.5 h-3.5" />
-                  <span>Budget level: {'$'.repeat(selectedRecipe.cost_level)}</span>
+                <span className="flex items-center space-x-1.5 bg-emerald-100 text-emerald-950 px-2.5 py-0.5 rounded-lg border border-stone-900 shadow-[1px_1px_0px_0px_#1C1917]">
+                  <DollarSign className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Est. {formatPricePerServing(selectedRecipe.cost_level, currency)} ({COST_TIERS[selectedRecipe.cost_level]?.label})</span>
                 </span>
               </div>
             </div>

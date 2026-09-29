@@ -2,6 +2,7 @@ import React from 'react';
 import { Search, Clock, DollarSign, X, Filter } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import type { CostLevel, DietTag } from '../types';
+import { formatPriceRange } from '../config/currency';
 
 const DIET_TAGS: DietTag[] = [
   'Vegan',
@@ -17,7 +18,7 @@ const DIET_TAGS: DietTag[] = [
 ];
 
 export const FilterBar: React.FC = () => {
-  const { filterState, setFilterState, resetFilters, recipes, filteredRecipes } = useApp();
+  const { filterState, setFilterState, resetFilters, recipes, filteredRecipes, currency } = useApp();
 
   const handleTagToggle = (tag: DietTag) => {
     const isSelected = filterState.selectedTags.includes(tag);
@@ -90,14 +91,16 @@ export const FilterBar: React.FC = () => {
             {([1, 2, 3] as CostLevel[]).map((level) => (
               <button
                 key={level}
+                type="button"
                 onClick={() => setFilterState(prev => ({ ...prev, costLevel: prev.costLevel === level ? null : level }))}
-                className={`px-2.5 py-1 rounded-xl text-[10px] font-black transition-all ${
+                title={`Filter by ${formatPriceRange(level, currency)} per serving`}
+                className={`px-2 sm:px-2.5 py-1 rounded-xl text-[10px] font-black transition-all cursor-pointer ${
                   filterState.costLevel === level
                     ? 'bg-emerald-500 text-stone-950 border border-stone-900 shadow-[1px_1px_0px_0px_#1C1917]'
                     : 'text-stone-800 hover:bg-stone-200'
                 }`}
               >
-                {'$'.repeat(level)}
+                {formatPriceRange(level, currency)}
               </button>
             ))}
           </div>

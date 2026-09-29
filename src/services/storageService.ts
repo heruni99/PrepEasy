@@ -50,7 +50,26 @@ export const storageService = {
       }
     }
     const local = localStorage.getItem(RECIPES_KEY);
-    return local ? JSON.parse(local) : SEED_RECIPES;
+    if (!local) {
+      localStorage.setItem(RECIPES_KEY, JSON.stringify(SEED_RECIPES));
+      return SEED_RECIPES;
+    }
+    try {
+      const stored: Recipe[] = JSON.parse(local);
+      const seedMap = new Map(SEED_RECIPES.map(s => [s.id, s]));
+      // Update existing seed recipes with latest localized text while preserving user recipes
+      const updated = stored.map(r => seedMap.get(r.id) || r);
+      const storedIds = new Set(stored.map(r => r.id));
+      SEED_RECIPES.forEach(seed => {
+        if (!storedIds.has(seed.id)) {
+          updated.push(seed);
+        }
+      });
+      localStorage.setItem(RECIPES_KEY, JSON.stringify(updated));
+      return updated;
+    } catch {
+      return SEED_RECIPES;
+    }
   },
 
   addRecipe: async (recipe: Omit<Recipe, 'id'>, userId?: string): Promise<Recipe> => {

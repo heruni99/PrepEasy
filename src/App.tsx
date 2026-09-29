@@ -12,6 +12,7 @@ import { MealPlanPickerModal } from './components/MealPlanPickerModal';
 import { RecipeFormModal } from './components/RecipeFormModal';
 import { AuthModal } from './components/AuthModal';
 import { ToastContainer } from './components/ToastContainer';
+import { ScrollFeatures } from './components/ScrollFeatures';
 import { UtensilsCrossed, Heart } from 'lucide-react';
 
 export default function App() {
@@ -19,8 +20,11 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <AppProvider>
-          <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950">
+          <div className="min-h-screen bg-[#F8F3EB] text-stone-900 flex flex-col selection:bg-[#FFD166] selection:text-stone-900">
             
+            {/* Scroll Reading Progress & Back To Top */}
+            <ScrollFeatures />
+
             {/* Header Navigation */}
             <Navbar />
 

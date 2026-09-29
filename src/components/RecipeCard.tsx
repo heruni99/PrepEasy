@@ -3,6 +3,7 @@ import { Clock, Heart, CalendarPlus, ChefHat } from 'lucide-react';
 import type { Recipe, MealType } from '../types';
 import { useApp } from '../context/AppContext';
 import { formatPriceRange } from '../config/currency';
+import { triggerHeartBurst } from '../utils/confetti';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -18,12 +19,16 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!favorited) {
+      triggerHeartBurst(e);
+    }
     toggleFavorite(recipe.id);
   };
 
   const handleAssignMeal = (dayIdx: number, mealType: MealType, e: React.MouseEvent) => {
     e.stopPropagation();
     setMealPlanSlot(dayIdx, mealType, recipe.id);
+    triggerHeartBurst(e);
     addToast(`Added "${recipe.title}" to ${DAYS_SHORT[dayIdx]} ${mealType}!`, 'success');
     setShowPlannerMenu(false);
   };
@@ -31,14 +36,14 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   return (
     <div
       onClick={() => openRecipeDetails(recipe)}
-      className="bg-white border-2 border-stone-900 rounded-3xl overflow-hidden shadow-[3px_3px_0px_0px_#1C1917] hover:shadow-[6px_6px_0px_0px_#1C1917] hover:-translate-y-1 transition-all cursor-pointer flex flex-col group relative"
+      className="bg-white border-2 border-stone-900 rounded-3xl overflow-hidden shadow-[3px_3px_0px_0px_#1C1917] hover:shadow-[7px_7px_0px_0px_#1C1917] hover:-translate-y-1.5 transition-all duration-300 cursor-pointer flex flex-col group relative"
     >
       {/* Image Banner Container */}
       <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-stone-100 border-b-2 border-stone-900">
         <img
           src={recipe.image_url}
           alt={recipe.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
           loading="lazy"
         />
 
@@ -106,15 +111,20 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 
             {/* Favorite Heart Toggle */}
             <button
+              type="button"
               onClick={handleFavoriteClick}
-              className={`w-9 h-9 rounded-xl border-2 border-stone-900 shadow-[2px_2px_0px_0px_#1C1917] flex items-center justify-center transition-all active:scale-90 ${
+              className={`w-9 h-9 rounded-xl border-2 border-stone-900 shadow-[2px_2px_0px_0px_#1C1917] flex items-center justify-center transition-all cursor-pointer group/heart ${
                 favorited
-                  ? 'bg-[#FF3B30] text-white'
-                  : 'bg-white text-stone-700 hover:text-[#FF3B30]'
+                  ? 'bg-rose-50 text-[#FF3B30] border-stone-900 hover:scale-110 active:scale-95'
+                  : 'bg-white text-stone-800 hover:bg-rose-50 hover:text-[#FF3B30] active:scale-90'
               }`}
               title={favorited ? 'Remove from favorites' : 'Add to favorites'}
             >
-              <Heart className={`w-4 h-4 stroke-[2.5] ${favorited ? 'fill-current' : ''}`} />
+              <Heart
+                className={`w-4 h-4 stroke-[2.5] transition-transform duration-200 ${
+                  favorited ? 'fill-current scale-110' : 'group-hover/heart:scale-115'
+                }`}
+              />
             </button>
 
           </div>

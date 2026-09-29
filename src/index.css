@@ -10,6 +10,10 @@
     --color-pop-red: #FF3B30;
   }
   
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     font-family: var(--font-sans);
     background-color: var(--color-bg);
@@ -49,12 +53,12 @@
   border: 2px solid #1C1917;
   border-radius: 1.25rem;
   box-shadow: 3px 3px 0px 0px #1C1917;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .pop-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 5px 5px 0px 0px #1C1917;
+  transform: translateY(-4px);
+  box-shadow: 6px 6px 0px 0px #1C1917;
 }
 
 .pop-shadow {
@@ -83,4 +87,127 @@
 
 .bg-warm-card {
   background-color: #FFFDF9;
+}
+
+/* Keyframe Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-13px) rotate(-3deg);
+  }
+}
+
+@keyframes floatDelay {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(3deg);
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 59, 48, 0);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.93) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.animate-float {
+  animation: float 3.5s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: floatSlow 5s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: floatDelay 4s ease-in-out 1s infinite;
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+.animate-pop-in {
+  animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s infinite;
+}
+
+.animate-wiggle:hover {
+  animation: wiggle 0.4s ease-in-out;
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.28) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 2.5s infinite;
 }

@@ -4,6 +4,7 @@ import type { MealType } from '../types';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { formatPricePerServing, COST_TIERS } from '../config/currency';
+import { triggerConfetti, triggerHeartBurst } from '../utils/confetti';
 
 const DAYS_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const MEALS: { type: MealType; label: string }[] = [
@@ -30,12 +31,28 @@ export const RecipeDetailModal: React.FC = () => {
   };
 
   const toggleStep = (idx: number) => {
-    setCompletedSteps(prev => ({ ...prev, [idx]: !prev[idx] }));
+    const nextState = !completedSteps[idx];
+    const updated = { ...completedSteps, [idx]: nextState };
+    setCompletedSteps(updated);
+
+    if (nextState) {
+      const allDone = selectedRecipe.steps.every((_, i) => updated[i]);
+      if (allDone) {
+        triggerConfetti();
+        addToast(`All ${selectedRecipe.steps.length} steps completed! Enjoy your meal! 🎉`, 'success');
+      }
+    }
   };
 
-  const handleAssignMeal = (dayIdx: number, mealType: MealType) => {
+  const handleAssignMeal = (dayIdx: number, mealType: MealType, e?: React.MouseEvent) => {
     setMealPlanSlot(dayIdx, mealType, selectedRecipe.id);
+    if (e) triggerHeartBurst(e);
     addToast(`Added "${selectedRecipe.title}" to ${DAYS_FULL[dayIdx]} ${mealType}!`, 'success');
+  };
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    if (!favorited) triggerHeartBurst(e);
+    toggleFavorite(selectedRecipe.id);
   };
 
   const handleDelete = async () => {
@@ -53,7 +70,7 @@ export const RecipeDetailModal: React.FC = () => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#FFFDF9] border-2 border-stone-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1C1917] relative text-stone-900 space-y-6 max-h-[90vh] overflow-y-auto"
+        className="bg-[#FFFDF9] border-2 border-stone-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1C1917] relative text-stone-900 space-y-6 max-h-[90vh] overflow-y-auto animate-pop-in"
       >
         {/* Close Button */}
         <button
@@ -72,12 +89,14 @@ export const RecipeDetailModal: React.FC = () => {
               className="w-full h-full object-cover"
             />
             <button
-              onClick={() => toggleFavorite(selectedRecipe.id)}
-              className={`absolute top-4 right-4 w-11 h-11 rounded-2xl border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] flex items-center justify-center transition-all ${
-                favorited ? 'bg-[#FF3B30] text-white' : 'bg-white text-stone-800 hover:text-[#FF3B30]'
+              type="button"
+              onClick={handleFavoriteClick}
+              className={`absolute top-4 right-4 w-11 h-11 rounded-2xl border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] flex items-center justify-center transition-all cursor-pointer group/fav ${
+                favorited ? 'bg-rose-50 text-[#FF3B30] hover:scale-105 active:scale-95' : 'bg-white text-stone-800 hover:text-[#FF3B30] active:scale-95'
               }`}
+              title={favorited ? 'Favorited' : 'Add to favorites'}
             >
-              <Heart className={`w-5 h-5 stroke-[2.5] ${favorited ? 'fill-current' : ''}`} />
+              <Heart className={`w-5 h-5 stroke-[2.5] transition-transform ${favorited ? 'fill-current scale-110' : 'group-hover/fav:scale-115'}`} />
             </button>
           </div>
 
@@ -145,14 +164,15 @@ export const RecipeDetailModal: React.FC = () => {
                 <span className="text-[10px] font-black text-stone-700">{dayName.slice(0, 3)}</span>
                 <div className="flex flex-col gap-1">
                   {MEALS.map(meal => (
-                    <button
-                      key={meal.type}
-                      onClick={() => handleAssignMeal(dayIdx, meal.type)}
-                      title={`Add to ${dayName} ${meal.label}`}
-                      className="text-[9px] font-extrabold py-0.5 rounded bg-white hover:bg-[#FF3B30] hover:text-white border border-stone-900 transition-colors uppercase"
-                    >
-                      {meal.type[0]}
-                    </button>
+                      <button
+                        key={meal.type}
+                        type="button"
+                        onClick={(e) => handleAssignMeal(dayIdx, meal.type, e)}
+                        title={`Add to ${dayName} ${meal.label}`}
+                        className="text-[9px] font-extrabold py-0.5 rounded bg-white hover:bg-[#FF3B30] hover:text-white border border-stone-900 transition-colors uppercase cursor-pointer active:scale-95"
+                      >
+                        {meal.type[0]}
+                      </button>
                   ))}
                 </div>
               </div>

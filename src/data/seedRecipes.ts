@@ -1,8 +1,10 @@
-import type { Recipe } from '../types';
+﻿import type { Recipe } from '../types';
 
+// Deterministic UUIDs for seed recipes â€” never change these after seeding Supabase,
+// so that favorites / meal-plan FK references stay valid forever.
 export const SEED_RECIPES: Recipe[] = [
   {
-    id: 'seed-1',
+    id: 'a1b2c3d4-0001-4000-8000-000000000001',
     title: '10-Minute Peanut Butter Chili Oil Noodles',
     prep_time_minutes: 10,
     cost_level: 1,
@@ -28,7 +30,7 @@ export const SEED_RECIPES: Recipe[] = [
     is_user_submitted: false
   },
   {
-    id: 'seed-2',
+    id: 'a1b2c3d4-0002-4000-8000-000000000002',
     title: '5-Minute Microwave Egg Fried Rice',
     prep_time_minutes: 5,
     cost_level: 1,
@@ -53,7 +55,7 @@ export const SEED_RECIPES: Recipe[] = [
     is_user_submitted: false
   },
   {
-    id: 'seed-3',
+    id: 'a1b2c3d4-0003-4000-8000-000000000003',
     title: 'Sheet Pan Crispy Chickpea & Sweet Potato Bowls',
     prep_time_minutes: 25,
     cost_level: 1,
@@ -71,7 +73,7 @@ export const SEED_RECIPES: Recipe[] = [
       'Drizzle of tahini or Greek yogurt dressing'
     ],
     steps: [
-      'Preheat oven to 400°F (200°C) and line a baking sheet with parchment paper.',
+      'Preheat oven to 400Â°F (200Â°C) and line a baking sheet with parchment paper.',
       'Toss dried chickpeas and cubed sweet potatoes with olive oil, paprika, cumin, garlic powder, salt, and pepper.',
       'Spread evenly on sheet pan and roast for 20-25 minutes until chickpeas are crispy and sweet potatoes are tender.',
       'Assemble bowls with spinach at the base, topped with roasted sweet potatoes and chickpeas.',
@@ -80,7 +82,7 @@ export const SEED_RECIPES: Recipe[] = [
     is_user_submitted: false
   },
   {
-    id: 'seed-4',
+    id: 'a1b2c3d4-0004-4000-8000-000000000004',
     title: 'Loaded Black Bean & Cheese Quesadilla',
     prep_time_minutes: 12,
     cost_level: 1,
@@ -105,7 +107,7 @@ export const SEED_RECIPES: Recipe[] = [
     is_user_submitted: false
   },
   {
-    id: 'seed-5',
+    id: 'a1b2c3d4-0005-4000-8000-000000000005',
     title: 'One-Pot Creamy Tomato & Spinach Pasta',
     prep_time_minutes: 18,
     cost_level: 1,
@@ -131,7 +133,7 @@ export const SEED_RECIPES: Recipe[] = [
     is_user_submitted: false
   },
   {
-    id: 'seed-6',
+    id: 'a1b2c3d4-0006-4000-8000-000000000006',
     title: 'Avocado Toast with Crispy Fried Egg & Chili Flakes',
     prep_time_minutes: 8,
     cost_level: 1,
@@ -156,7 +158,7 @@ export const SEED_RECIPES: Recipe[] = [
     is_user_submitted: false
   },
   {
-    id: 'seed-7',
+    id: 'a1b2c3d4-0007-4000-8000-000000000007',
     title: 'High-Protein Greek Yogurt Parfait Bowl',
     prep_time_minutes: 5,
     cost_level: 1,
@@ -179,7 +181,7 @@ export const SEED_RECIPES: Recipe[] = [
     is_user_submitted: false
   },
   {
-    id: 'seed-8',
+    id: 'a1b2c3d4-0008-4000-8000-000000000008',
     title: '5-Minute Chocolate Chip Mug Cake',
     prep_time_minutes: 3,
     cost_level: 1,
@@ -203,7 +205,7 @@ export const SEED_RECIPES: Recipe[] = [
     is_user_submitted: false
   },
   {
-    id: 'seed-9',
+    id: 'a1b2c3d4-0009-4000-8000-000000000009',
     title: 'Garlic Butter Chicken Thighs & Broccoli',
     prep_time_minutes: 20,
     cost_level: 2,
@@ -222,14 +224,14 @@ export const SEED_RECIPES: Recipe[] = [
     ],
     steps: [
       'Season chicken thighs generously with salt, pepper, paprika, and oregano.',
-      'Heat olive oil and 1 tbsp butter in a skillet over medium-high heat. Add chicken and sear for 5-6 minutes per side until golden brown and cooked through (165°F). Remove chicken.',
-      'In the same skillet, add remaining butter, minced garlic, and broccoli florets. Sauté for 4-5 minutes until broccoli is vibrant green and tender-crisp.',
+      'Heat olive oil and 1 tbsp butter in a skillet over medium-high heat. Add chicken and sear for 5-6 minutes per side until golden brown and cooked through (165Â°F). Remove chicken.',
+      'In the same skillet, add remaining butter, minced garlic, and broccoli florets. SautÃ© for 4-5 minutes until broccoli is vibrant green and tender-crisp.',
       'Return chicken thighs to skillet, spoon garlic butter sauce over top, and serve with fresh lemon squeeze.'
     ],
     is_user_submitted: false
   },
   {
-    id: 'seed-10',
+    id: 'a1b2c3d4-0010-4000-8000-000000000010',
     title: 'Classic Tuna Melt Sandwich',
     prep_time_minutes: 10,
     cost_level: 1,
@@ -253,7 +255,7 @@ export const SEED_RECIPES: Recipe[] = [
     is_user_submitted: false
   },
   {
-    id: 'seed-11',
+    id: 'a1b2c3d4-0011-4000-8000-000000000011',
     title: 'Cheesy Garlic Bread Toast',
     prep_time_minutes: 10,
     cost_level: 1,
@@ -270,12 +272,12 @@ export const SEED_RECIPES: Recipe[] = [
       'Mix softened butter, minced garlic, and parsley together in a bowl.',
       'Spread butter mixture generously over bread slices.',
       'Top each slice with shredded mozzarella.',
-      'Bake in toaster oven or main oven at 400°F (200°C) for 7-10 minutes until cheese is bubbly and edges are toasted golden.'
+      'Bake in toaster oven or main oven at 400Â°F (200Â°C) for 7-10 minutes until cheese is bubbly and edges are toasted golden.'
     ],
     is_user_submitted: false
   },
   {
-    id: 'seed-12',
+    id: 'a1b2c3d4-0012-4000-8000-000000000012',
     title: 'Savory Tofu & Veggie Stir-Fry',
     prep_time_minutes: 20,
     cost_level: 1,
@@ -299,7 +301,7 @@ export const SEED_RECIPES: Recipe[] = [
     is_user_submitted: false
   },
   {
-    id: 'seed-13',
+    id: 'a1b2c3d4-0013-4000-8000-000000000013',
     title: 'Hearty 1-Pot Lentil & Tomato Soup',
     prep_time_minutes: 25,
     cost_level: 1,
@@ -316,7 +318,7 @@ export const SEED_RECIPES: Recipe[] = [
       '1 tbsp olive oil'
     ],
     steps: [
-      'Heat olive oil in a soup pot over medium heat. Sauté onion and garlic for 3 minutes.',
+      'Heat olive oil in a soup pot over medium heat. SautÃ© onion and garlic for 3 minutes.',
       'Add dry lentils, crushed tomatoes, vegetable broth, cumin, and paprika.',
       'Bring to a boil, then cover pot and turn heat down to low.',
       'Simmer for 20 minutes until lentils are soft and tender.',
@@ -325,7 +327,7 @@ export const SEED_RECIPES: Recipe[] = [
     is_user_submitted: false
   },
   {
-    id: 'seed-14',
+    id: 'a1b2c3d4-0014-4000-8000-000000000014',
     title: 'Quick Chicken Fajita Wrap',
     prep_time_minutes: 15,
     cost_level: 2,
@@ -341,7 +343,7 @@ export const SEED_RECIPES: Recipe[] = [
       '2 tbsp sour cream or salsa'
     ],
     steps: [
-      'Sauté bell pepper and red onion in a skillet with a dash of oil and fajita seasoning for 4 minutes.',
+      'SautÃ© bell pepper and red onion in a skillet with a dash of oil and fajita seasoning for 4 minutes.',
       'Toss in cooked chicken breast to heat through.',
       'Warm flour tortillas in microwave for 15 seconds.',
       'Divide chicken and veggie mixture into tortillas, top with shredded cheese and sour cream, then roll tightly into wraps.'
@@ -349,7 +351,7 @@ export const SEED_RECIPES: Recipe[] = [
     is_user_submitted: false
   },
   {
-    id: 'seed-15',
+    id: 'a1b2c3d4-0015-4000-8000-000000000015',
     title: 'Easy Overnight Chia & Oats Jars',
     prep_time_minutes: 5,
     cost_level: 1,

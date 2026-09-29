@@ -154,7 +154,16 @@ export const storageService = {
     if (existing) {
       if (isSupabaseConfigured && supabase) {
         try {
-          await supabase.from('favorites').delete().eq('id', existing.id);
+          if (existing.id) {
+            // Delete by real Postgres UUID if we have one
+            await supabase.from('favorites').delete().eq('id', existing.id);
+          } else {
+            // Fallback: delete by the composite key (user + recipe)
+            await supabase.from('favorites')
+              .delete()
+              .eq('user_id', userId)
+              .eq('recipe_id', recipeId);
+          }
         } catch (err) {
           console.warn('Supabase favorite delete error', err);
         }
@@ -163,19 +172,32 @@ export const storageService = {
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
       return false; // Removed from favorites
     } else {
+      if (isSupabaseConfigured && supabase) {
+        try {
+          // Never send `id` — let Postgres auto-generate the UUID
+          const { data, error } = await supabase
+            .from('favorites')
+            .insert([{ user_id: userId, recipe_id: recipeId }])
+            .select()
+            .single();
+          if (!error && data) {
+            // Use the Postgres-returned row (with real UUID) for localStorage too
+            const updated = [...favorites, data as Favorite];
+            localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+            return true;
+          }
+          console.warn('Supabase favorite insert error', error);
+        } catch (err) {
+          console.warn('Supabase favorite insert error', err);
+        }
+      }
+      // localStorage-only fallback (no Supabase) — local id is fine here
       const newFav: Favorite = {
         id: `fav-${Date.now()}`,
         user_id: userId,
         recipe_id: recipeId,
         created_at: new Date().toISOString()
       };
-      if (isSupabaseConfigured && supabase) {
-        try {
-          await supabase.from('favorites').insert([newFav]);
-        } catch (err) {
-          console.warn('Supabase favorite insert error', err);
-        }
-      }
       const updated = [...favorites, newFav];
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
       return true; // Added to favorites

@@ -12,6 +12,10 @@ export const Navbar: React.FC = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const handleLogoClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <header className="sticky top-0 z-40 bg-[#FFFDF9]/90 backdrop-blur-md border-b-2 border-stone-900 shadow-sm">
       
@@ -21,7 +25,12 @@ export const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
         
         {/* Brand Logo & Name */}
-        <Link to="/" className="flex items-center space-x-3 group">
+        <Link
+          to="/"
+          onClick={handleLogoClick}
+          className="flex items-center space-x-3 group cursor-pointer"
+          title="PrepEasy - Back to top"
+        >
           <div className="w-11 h-11 rounded-2xl bg-[#FF3B30] text-white flex items-center justify-center border-2 border-stone-900 shadow-[3px_3px_0px_0px_#1C1917] group-hover:rotate-3 transition-transform">
             <UtensilsCrossed className="w-6 h-6 stroke-[2.5]" />
           </div>
@@ -40,6 +49,11 @@ export const Navbar: React.FC = () => {
           
           <Link
             to="/"
+            onClick={() => {
+              if (isActive('/')) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
             className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
               isActive('/')
                 ? 'bg-[#FF3B30] text-white shadow-[2px_2px_0px_0px_#1C1917] border border-stone-900'
@@ -162,7 +176,17 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Nav Links */}
       <div className="flex md:hidden items-center justify-around border-t border-stone-300 py-2 bg-[#F8F3EB]">
-        <Link to="/" className={`text-xs font-bold ${isActive('/') ? 'text-[#FF3B30]' : 'text-stone-700'}`}>Browse</Link>
+        <Link
+          to="/"
+          onClick={() => {
+            if (isActive('/')) {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
+          className={`text-xs font-bold ${isActive('/') ? 'text-[#FF3B30]' : 'text-stone-700'}`}
+        >
+          Browse
+        </Link>
         <Link to="/planner" className={`text-xs font-bold ${isActive('/planner') ? 'text-[#FF3B30]' : 'text-stone-700'}`}>Planner ({mealPlan.length})</Link>
         <Link to="/favorites" className={`text-xs font-bold ${isActive('/favorites') ? 'text-[#FF3B30]' : 'text-stone-700'}`}>Favorites ({favorites.length})</Link>
         <Link to="/my-recipes" className={`text-xs font-bold ${isActive('/my-recipes') ? 'text-[#FF3B30]' : 'text-stone-700'}`}>My Recipes</Link>

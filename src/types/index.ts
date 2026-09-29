@@ -29,7 +29,7 @@ export interface Recipe {
 export type MealType = 'breakfast' | 'lunch' | 'dinner';
 
 export interface Favorite {
-  id: string;
+  id?: string;  // Postgres auto-generates; optional so we never send it on insert
   user_id: string;
   recipe_id: string;
   created_at?: string;

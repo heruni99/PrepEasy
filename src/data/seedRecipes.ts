@@ -378,5 +378,200 @@ export const SEED_RECIPES: Recipe[] = [
       'In the morning, stir the creamy oats, top with sliced bananas or fresh fruit, and enjoy a nourishing grab-and-go breakfast!'
     ],
     is_user_submitted: false
+  },
+  {
+    id: 'a1b2c3d4-0016-4000-8000-000000000016',
+    title: 'Kiribath (Traditional Coconut Milk Rice)',
+    prep_time_minutes: 20,
+    cost_level: 1,
+    diet_tags: ['Vegan', 'Vegetarian', 'Budget', 'One-Pot', 'Gluten-Free', 'Dairy-Free'],
+    image_url: 'https://images.unsplash.com/photo-1516714435131-44d6b64dc6a2?auto=format&fit=crop&w=800&q=80',
+    ingredients: [
+      '1 cup white raw rice (kekulu or samba)',
+      '2 cups water (for boiling)',
+      '1 cup thick coconut milk (first extract / pol kiri)',
+      '1/2 tsp salt (dissolved in the coconut milk)'
+    ],
+    steps: [
+      'Wash the rice thoroughly and add to a rice cooker pot or heavy saucepan with 2 cups of water.',
+      'Cook over medium heat until the water is completely absorbed and the rice is soft and mushy (approx 12-15 minutes).',
+      'Dissolve salt into the thick coconut milk, then pour evenly over the cooked hot rice.',
+      'Stir gently to incorporate, reduce heat to lowest setting (or keep warm mode), and let simmer covered for 5-7 minutes until creamy, rich, and thick.',
+      'Transfer hot milk rice onto a flat plate or banana leaf, flatten smoothly with a piece of banana leaf or buttered spoon, let cool for 5 minutes, and cut into classic diamond-shaped blocks.',
+      'Serve warm with spicy lunu miris or sweet ripe bananas!'
+    ],
+    is_user_submitted: false
+  },
+  {
+    id: 'a1b2c3d4-0017-4000-8000-000000000017',
+    title: 'Kottu Roti (Simple Veggie & Egg)',
+    prep_time_minutes: 20,
+    cost_level: 1,
+    diet_tags: ['Vegetarian', 'Budget', 'High Protein', 'One-Pot', 'Dairy-Free', 'Halal'],
+    image_url: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80',
+    ingredients: [
+      '4 godamba rotis or parathas (store-bought), sliced into thin ribbons',
+      '2 large fresh eggs',
+      '1 cup shredded cabbage',
+      '1/2 cup grated carrot',
+      '1/2 cup sliced leeks or spring onions',
+      '2 green chilies (amu miris), chopped',
+      '1 small red onion, sliced',
+      '2 cloves garlic and 1/2-inch ginger, minced',
+      '1 tsp Sri Lankan roasted curry powder',
+      '1/2 tsp crushed chili flakes (kochu kudu)',
+      '1.5 tbsp soy sauce',
+      '2 tbsp vegetable oil',
+      'Salt and black pepper to taste'
+    ],
+    steps: [
+      'Heat vegetable oil in a large wok or deep flat frying pan over high heat. Sauté onion, garlic, ginger, and green chilies for 1 minute until fragrant.',
+      'Toss in shredded cabbage, carrots, and leeks. Stir-fry briskly for 2 minutes on high heat so veggies remain tender-crisp.',
+      'Push vegetables to the side of the pan, crack in the eggs, and scramble vigorously until soft curds form.',
+      'Add the shredded roti ribbons, roasted curry powder, chili flakes, soy sauce, black pepper, and salt.',
+      'Using two spatulas or metal turners, chop, toss, and clatter rhythmically (dorm style!) for 3 minutes until steam rises and everything is thoroughly mixed and sizzling.',
+      'Serve steaming hot with a squeeze of fresh lime.'
+    ],
+    is_user_submitted: false
+  },
+  {
+    id: 'a1b2c3d4-0018-4000-8000-000000000018',
+    title: 'Parippu (Sri Lankan Creamy Dhal Curry)',
+    prep_time_minutes: 25,
+    cost_level: 1,
+    diet_tags: ['Vegan', 'Vegetarian', 'High Protein', 'One-Pot', 'Budget', 'Gluten-Free', 'Dairy-Free', 'Halal'],
+    image_url: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80',
+    ingredients: [
+      '1 cup red split lentils (mysore dhal / paruppu), washed and drained',
+      '2 cups water',
+      '1/2 cup thick coconut milk (first extract / pol kiri)',
+      '1 small red onion, finely chopped',
+      '2 cloves garlic, sliced',
+      '1-2 green chilies (amu miris), split lengthwise',
+      '1/2 tsp turmeric powder (kaha kudu)',
+      '1 tsp unroasted curry powder',
+      '1 sprig fresh curry leaves (karapincha)',
+      '1/2 tsp salt (to taste)',
+      'Optional tempering: 1 tsp coconut oil, 1/2 tsp mustard seeds & dried chili pieces'
+    ],
+    steps: [
+      'Rinse red lentils in a pot 2-3 times until the water runs clear.',
+      'In the same pot, combine washed dhal, water, chopped onions, garlic, green chilies, turmeric, curry powder, and curry leaves.',
+      'Bring to a boil over medium heat, then simmer uncovered for 12-15 minutes until dhal is tender and the water is mostly absorbed.',
+      'Pour in the thick coconut milk and stir in salt. Simmer gently for another 4-5 minutes on low heat until the gravy turns rich, velvety, and fragrant.',
+      'Optional: In a tiny pan, heat 1 tsp coconut oil, pop mustard seeds and dried chilies for 30 seconds, and pour the sizzling temper over the curry.',
+      'Enjoy with warm steamed rice, roast paan, or string hoppers.'
+    ],
+    is_user_submitted: false
+  },
+  {
+    id: 'a1b2c3d4-0019-4000-8000-000000000019',
+    title: 'Pol Sambol with Crusty Bread',
+    prep_time_minutes: 10,
+    cost_level: 1,
+    diet_tags: ['Vegan', 'Vegetarian', 'Quick (<15m)', 'Budget', 'Dairy-Free', 'One-Pot'],
+    image_url: 'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=800&q=80',
+    ingredients: [
+      '1 cup freshly grated coconut (or desiccated coconut rehydrated with 3 tbsp warm water)',
+      '1 small red onion (rathu lunu), very finely minced',
+      '1 green chili (amu miris), finely sliced',
+      '1 tbsp red chili powder (miris kudu)',
+      '1/2 tsp crushed chili flakes (kochu kudu)',
+      '1/2 tsp salt',
+      '1 tbsp fresh lime juice',
+      '4 slices bakery white bread (kade paan) or crusty roast paan',
+      'Optional: 1 tsp pounded Maldive fish chips (omit for strictly vegan)'
+    ],
+    steps: [
+      'In a wide mortar or mixing bowl, place chili powder, chili flakes, and salt.',
+      'Add fresh lime juice and mix with the back of a spoon to create a deep red, smooth paste.',
+      'Add the minced red onions and green chili. Lightly crush and mash into the paste to release their juices.',
+      'Add the grated coconut into the bowl. Using clean fingers or a spoon, knead and mix the coconut with the chili paste until the entire sambol is evenly vibrant crimson-orange.',
+      'Taste and adjust lime juice and salt as needed.',
+      'Pile generously into warm buttered crusty bread or roast paan slices and enjoy the ultimate Sri Lankan comfort meal.'
+    ],
+    is_user_submitted: false
+  },
+  {
+    id: 'a1b2c3d4-0020-4000-8000-000000000020',
+    title: 'Egg Hoppers (Simplified Stovetop Version)',
+    prep_time_minutes: 20,
+    cost_level: 1,
+    diet_tags: ['Vegetarian', 'Budget', 'High Protein', 'Gluten-Free', 'Dairy-Free'],
+    image_url: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80',
+    ingredients: [
+      '1.5 cups ready-made hopper flour mix (e.g. Harischandra or Wijaya) or rice flour batter',
+      '3/4 cup warm water or light coconut milk',
+      '1/4 cup thick coconut milk (pol kiri)',
+      '1/4 tsp instant yeast & 1/2 tsp sugar (if using raw rice flour)',
+      '3-4 fresh eggs',
+      '1 tsp coconut oil (for greasing pan)',
+      'Freshly cracked black pepper and salt to taste'
+    ],
+    steps: [
+      'Mix the hopper batter with coconut milk and water until it reaches the consistency of thin pancake batter. Rest as per packet instructions.',
+      'Heat a small non-stick hopper pan (appa thachchiya) or small curved non-stick frying pan over medium heat. Wipe lightly with a touch of coconut oil using a paper towel.',
+      'Pour 1 ladle of batter into the center of the pan. Immediately pick up the pan by the handles and swirl it around in a circular motion so the batter coats the sides, leaving a thicker pool in the center.',
+      'Immediately crack 1 fresh egg right into the center of the batter.',
+      'Cover tightly with a lid and cook on low-medium heat for 2.5 to 3 minutes until the lacy edges turn golden and crisp, the egg white is set, and the yolk is cooked to your preference.',
+      'Slide the hopper carefully onto a plate, season generously with black pepper and salt, and serve with pol sambol or lunu miris.'
+    ],
+    is_user_submitted: false
+  },
+  {
+    id: 'a1b2c3d4-0021-4000-8000-000000000021',
+    title: 'Isso Wade (Crispy Dhal & Prawn Fritters)',
+    prep_time_minutes: 25,
+    cost_level: 2,
+    diet_tags: ['High Protein', 'Gluten-Free', 'Dairy-Free', 'Halal'],
+    image_url: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=80',
+    ingredients: [
+      '1 cup yellow split peas (kadala paruppu / chana dhal), soaked in water for 2 hours',
+      '15-18 small fresh prawns (shrimp), cleaned with tails intact',
+      '1 small red onion, finely chopped',
+      '2 green chilies, finely chopped',
+      '1 sprig fresh curry leaves (karapincha), finely shredded',
+      '1/2 tsp ginger-garlic paste',
+      '1 tsp red chili flakes (kochu kudu)',
+      '1/2 tsp cumin seeds',
+      '1/2 tsp salt (to taste)',
+      '3 tbsp vegetable or coconut oil (for shallow pan-frying or baking)'
+    ],
+    steps: [
+      'Drain the soaked split peas completely. Reserve 2 tablespoons of whole peas for crunch.',
+      'Coarsely grind the remaining split peas in a blender or food processor without adding any water (do not make a smooth paste; keep it textured).',
+      'In a bowl, mix the ground dhal with the reserved whole peas, chopped onions, green chilies, curry leaves, ginger-garlic paste, chili flakes, cumin seeds, and salt.',
+      'Divide the mixture into golf ball-sized portions, flatten into discs, and press 2-3 seasoned fresh prawns firmly on top of each patty.',
+      'Stovetop or Oven: Heat 3 tbsp oil in a flat non-stick skillet over medium heat. Fry wade patties for 4-5 minutes per side until deep golden and crunchy (or bake/air-fry at 200°C / 400°F for 15 minutes lightly brushed with oil).',
+      'Serve crisp and hot with a squeeze of fresh lime and a sprinkle of chili salt!'
+    ],
+    is_user_submitted: false
+  },
+  {
+    id: 'a1b2c3d4-0022-4000-8000-000000000022',
+    title: 'String Hoppers with Coconut Sambol',
+    prep_time_minutes: 20,
+    cost_level: 1,
+    diet_tags: ['Vegan', 'Vegetarian', 'Budget', 'Gluten-Free', 'Dairy-Free'],
+    image_url: 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=800&q=80',
+    ingredients: [
+      '10-12 freshly bought string hoppers (indiappa) or dried packaged string hoppers',
+      '1 cup freshly grated coconut',
+      '1 tbsp red chili powder & 1/2 tsp chili flakes',
+      '1 small red onion, finely minced',
+      '1 green chili, minced',
+      '1 tbsp fresh lime juice',
+      '1/2 tsp salt',
+      'Optional quick kiri hodi: 1/2 cup coconut milk simmered with pinch of fenugreek & turmeric'
+    ],
+    steps: [
+      'Dorm / quick prep: If using fresh bakery string hoppers, arrange on a microwave-safe plate, sprinkle lightly with 1 tsp water, cover with a microwave lid, and reheat on high for 45-60 seconds until steaming soft.',
+      '(If using dried string hoppers: Steam over boiling water or in a rice cooker steamer basket for 4-5 minutes until tender).',
+      'In a bowl, combine chili powder, chili flakes, salt, and lime juice into a paste.',
+      'Mix in minced red onions and green chili, then fold in grated coconut until thoroughly and uniformly blended.',
+      'Stack the warm, fluffy string hoppers on a plate alongside a generous serving of pol sambol and optional warm coconut milk kiri hodi.',
+      'Eat by breaking the delicate string hoppers with your fingers and scooping up the spicy, tangy coconut sambol.'
+    ],
+    is_user_submitted: false
   }
 ];

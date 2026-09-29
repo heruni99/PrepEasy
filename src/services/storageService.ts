@@ -7,6 +7,49 @@ const FAVORITES_KEY = 'prepeasy_favorites';
 const MEAL_PLAN_KEY = 'prepeasy_meal_plan';
 const USER_KEY = 'prepeasy_user';
 
+// Map legacy seed IDs ('seed-1' .. 'seed-22') to deterministic UUIDs
+export const LEGACY_SEED_MAP: Record<string, string> = {};
+for (let i = 1; i <= 22; i++) {
+  const pad4 = String(i).padStart(4, '0');
+  const pad2 = String(i).padStart(2, '0');
+  LEGACY_SEED_MAP[`seed-${i}`] = `a1b2c3d4-${pad4}-4000-8000-0000000000${pad2}`;
+}
+
+export const normalizeTitle = (title: string): string => {
+  return title.toLowerCase().trim().replace(/\s+/g, ' ');
+};
+
+export const migrateLegacyId = (id: string): string => {
+  return LEGACY_SEED_MAP[id] || id;
+};
+
+// Merge stored recipes with canonical SEED_RECIPES without duplicates
+export const mergeWithCanonicalSeeds = (existingRecipes: Recipe[]): Recipe[] => {
+  const canonicalSeedIds = new Set(SEED_RECIPES.map(s => s.id));
+  const canonicalSeedTitles = new Set(SEED_RECIPES.map(s => normalizeTitle(s.title)));
+
+  const userRecipes: Recipe[] = [];
+  const seenIds = new Set<string>(canonicalSeedIds);
+  const seenTitles = new Set<string>(canonicalSeedTitles);
+
+  for (const r of existingRecipes) {
+    if (!r || !r.id || !r.title) continue;
+    const normTitle = normalizeTitle(r.title);
+
+    // If it's a legacy seed id (seed-1, etc.) or matches any canonical seed id or title, skip duplicate
+    if (r.id.startsWith('seed-') || LEGACY_SEED_MAP[r.id] || seenIds.has(r.id) || seenTitles.has(normTitle)) {
+      continue;
+    }
+
+    seenIds.add(r.id);
+    seenTitles.add(normTitle);
+    userRecipes.push(r);
+  }
+
+  // Canonical seeds always come first, followed by any unique custom user recipes
+  return [...SEED_RECIPES, ...userRecipes];
+};
+
 // Helper to initialize LocalStorage with default seed recipes if empty
 export const initializeStorage = () => {
   if (!localStorage.getItem(RECIPES_KEY)) {
@@ -14,15 +57,15 @@ export const initializeStorage = () => {
   }
   if (!localStorage.getItem(FAVORITES_KEY)) {
     localStorage.setItem(FAVORITES_KEY, JSON.stringify([
-      { id: 'fav-1', user_id: 'guest-user', recipe_id: 'seed-1' },
-      { id: 'fav-2', user_id: 'guest-user', recipe_id: 'seed-4' }
+      { id: 'fav-1', user_id: 'guest-user', recipe_id: 'a1b2c3d4-0001-4000-8000-000000000001' },
+      { id: 'fav-2', user_id: 'guest-user', recipe_id: 'a1b2c3d4-0004-4000-8000-000000000004' }
     ]));
   }
   if (!localStorage.getItem(MEAL_PLAN_KEY)) {
     localStorage.setItem(MEAL_PLAN_KEY, JSON.stringify([
-      { id: 'mp-1', user_id: 'guest-user', day_of_week: 0, meal_type: 'breakfast', recipe_id: 'seed-7' },
-      { id: 'mp-2', user_id: 'guest-user', day_of_week: 0, meal_type: 'lunch', recipe_id: 'seed-1' },
-      { id: 'mp-3', user_id: 'guest-user', day_of_week: 1, meal_type: 'dinner', recipe_id: 'seed-5' }
+      { id: 'mp-1', user_id: 'guest-user', day_of_week: 0, meal_type: 'breakfast', recipe_id: 'a1b2c3d4-0007-4000-8000-000000000007' },
+      { id: 'mp-2', user_id: 'guest-user', day_of_week: 0, meal_type: 'lunch', recipe_id: 'a1b2c3d4-0001-4000-8000-000000000001' },
+      { id: 'mp-3', user_id: 'guest-user', day_of_week: 1, meal_type: 'dinner', recipe_id: 'a1b2c3d4-0005-4000-8000-000000000005' }
     ]));
   }
 };
@@ -35,14 +78,7 @@ export const storageService = {
       try {
         const { data, error } = await supabase.from('recipes').select('*');
         if (!error && data && data.length > 0) {
-          // Merge local seed recipes with supabase recipes if needed
-          const remoteMap = new Map(data.map((r: Recipe) => [r.id, r]));
-          const merged = [...data];
-          SEED_RECIPES.forEach(seed => {
-            if (!remoteMap.has(seed.id)) {
-              merged.push(seed);
-            }
-          });
+          const merged = mergeWithCanonicalSeeds(data as Recipe[]);
           return merged;
         }
       } catch (err) {
@@ -56,18 +92,11 @@ export const storageService = {
     }
     try {
       const stored: Recipe[] = JSON.parse(local);
-      const seedMap = new Map(SEED_RECIPES.map(s => [s.id, s]));
-      // Update existing seed recipes with latest localized text while preserving user recipes
-      const updated = stored.map(r => seedMap.get(r.id) || r);
-      const storedIds = new Set(stored.map(r => r.id));
-      SEED_RECIPES.forEach(seed => {
-        if (!storedIds.has(seed.id)) {
-          updated.push(seed);
-        }
-      });
-      localStorage.setItem(RECIPES_KEY, JSON.stringify(updated));
-      return updated;
+      const merged = mergeWithCanonicalSeeds(stored);
+      localStorage.setItem(RECIPES_KEY, JSON.stringify(merged));
+      return merged;
     } catch {
+      localStorage.setItem(RECIPES_KEY, JSON.stringify(SEED_RECIPES));
       return SEED_RECIPES;
     }
   },
@@ -155,20 +184,54 @@ export const storageService = {
           .from('favorites')
           .select('*')
           .eq('user_id', userId);
-        if (!error && data) return data;
+        if (!error && data) {
+          return (data as Favorite[]).map(f => ({
+            ...f,
+            recipe_id: migrateLegacyId(f.recipe_id)
+          }));
+        }
       } catch (err) {
         console.warn('Supabase favorites fetch failed', err);
       }
     }
     const local = localStorage.getItem(FAVORITES_KEY);
-    const favs: Favorite[] = local ? JSON.parse(local) : [];
-    return favs.filter(f => f.user_id === userId || userId === 'guest-user');
+    let favs: Favorite[] = local ? JSON.parse(local) : [];
+    let modified = false;
+
+    // Migrate any legacy seed-X IDs in favorites to UUIDs
+    favs = favs.map(f => {
+      const migrated = migrateLegacyId(f.recipe_id);
+      if (migrated !== f.recipe_id) {
+        modified = true;
+        return { ...f, recipe_id: migrated };
+      }
+      return f;
+    });
+
+    // Deduplicate favorites by user_id + recipe_id
+    const seenFav = new Set<string>();
+    const uniqueFavs: Favorite[] = [];
+    for (const f of favs) {
+      const key = `${f.user_id}:${f.recipe_id}`;
+      if (!seenFav.has(key)) {
+        seenFav.add(key);
+        uniqueFavs.push(f);
+      } else {
+        modified = true;
+      }
+    }
+
+    if (modified) {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(uniqueFavs));
+    }
+    return uniqueFavs.filter(f => f.user_id === userId || userId === 'guest-user');
   },
 
   toggleFavorite: async (userId: string, recipeId: string): Promise<boolean> => {
     initializeStorage();
+    const normalizedRecipeId = migrateLegacyId(recipeId);
     const favorites = await storageService.getFavorites(userId);
-    const existing = favorites.find(f => f.recipe_id === recipeId);
+    const existing = favorites.find(f => migrateLegacyId(f.recipe_id) === normalizedRecipeId);
 
     if (existing) {
       if (isSupabaseConfigured && supabase) {
@@ -181,13 +244,13 @@ export const storageService = {
             await supabase.from('favorites')
               .delete()
               .eq('user_id', userId)
-              .eq('recipe_id', recipeId);
+              .eq('recipe_id', normalizedRecipeId);
           }
         } catch (err) {
           console.warn('Supabase favorite delete error', err);
         }
       }
-      const updated = favorites.filter(f => f.recipe_id !== recipeId);
+      const updated = favorites.filter(f => migrateLegacyId(f.recipe_id) !== normalizedRecipeId);
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
       return false; // Removed from favorites
     } else {
@@ -196,7 +259,7 @@ export const storageService = {
           // Never send `id` — let Postgres auto-generate the UUID
           const { data, error } = await supabase
             .from('favorites')
-            .insert([{ user_id: userId, recipe_id: recipeId }])
+            .insert([{ user_id: userId, recipe_id: normalizedRecipeId }])
             .select()
             .single();
           if (!error && data) {
@@ -214,7 +277,7 @@ export const storageService = {
       const newFav: Favorite = {
         id: `fav-${Date.now()}`,
         user_id: userId,
-        recipe_id: recipeId,
+        recipe_id: normalizedRecipeId,
         created_at: new Date().toISOString()
       };
       const updated = [...favorites, newFav];
@@ -232,13 +295,35 @@ export const storageService = {
           .from('meal_plan_entries')
           .select('*')
           .eq('user_id', userId);
-        if (!error && data) return data;
+        if (!error && data) {
+          return (data as MealPlanEntry[]).map(e => ({
+            ...e,
+            recipe_id: migrateLegacyId(e.recipe_id)
+          }));
+        }
       } catch (err) {
         console.warn('Supabase meal plan fetch failed', err);
       }
     }
     const local = localStorage.getItem(MEAL_PLAN_KEY);
-    const entries: MealPlanEntry[] = local ? JSON.parse(local) : [];
+    let entries: MealPlanEntry[] = local ? JSON.parse(local) : [];
+    let modified = false;
+
+    // Migrate legacy seed-X IDs in meal plans
+    entries = entries.map(e => {
+      if (e.recipe_id) {
+        const migrated = migrateLegacyId(e.recipe_id);
+        if (migrated !== e.recipe_id) {
+          modified = true;
+          return { ...e, recipe_id: migrated };
+        }
+      }
+      return e;
+    });
+
+    if (modified) {
+      localStorage.setItem(MEAL_PLAN_KEY, JSON.stringify(entries));
+    }
     return entries.filter(e => e.user_id === userId || userId === 'guest-user');
   },
 
@@ -249,6 +334,7 @@ export const storageService = {
     recipeId: string | null
   ): Promise<MealPlanEntry[]> => {
     initializeStorage();
+    const normalizedRecipeId = recipeId ? migrateLegacyId(recipeId) : null;
     const allEntries: MealPlanEntry[] = JSON.parse(localStorage.getItem(MEAL_PLAN_KEY) || '[]');
     
     // Filter out existing entry for this specific slot
@@ -256,13 +342,13 @@ export const storageService = {
       e => !(e.day_of_week === dayOfWeek && e.meal_type === mealType && (e.user_id === userId || userId === 'guest-user'))
     );
 
-    if (recipeId) {
+    if (normalizedRecipeId) {
       const newEntry: MealPlanEntry = {
         id: `mp-${Date.now()}-${Math.random().toString(36).substr(2, 3)}`,
         user_id: userId,
         day_of_week: dayOfWeek,
         meal_type: mealType,
-        recipe_id: recipeId,
+        recipe_id: normalizedRecipeId,
         created_at: new Date().toISOString()
       };
       filtered.push(newEntry);
@@ -272,10 +358,10 @@ export const storageService = {
 
     if (isSupabaseConfigured && supabase) {
       try {
-        if (!recipeId) {
+        if (!normalizedRecipeId) {
           await supabase.from('meal_plan_entries').delete().match({ user_id: userId, day_of_week: dayOfWeek, meal_type: mealType });
         } else {
-          await supabase.from('meal_plan_entries').upsert({ user_id: userId, day_of_week: dayOfWeek, meal_type: mealType, recipe_id: recipeId });
+          await supabase.from('meal_plan_entries').upsert({ user_id: userId, day_of_week: dayOfWeek, meal_type: mealType, recipe_id: normalizedRecipeId });
         }
       } catch (err) {
         console.warn('Supabase meal plan slot update error', err);

@@ -113,7 +113,7 @@ export const SEED_RECIPES: Recipe[] = [
     prep_time_minutes: 18,
     cost_level: 1,
     diet_tags: ['Vegetarian', 'One-Pot', 'Budget'],
-    image_url: 'https://images.unsplash.com/photo-1621996346565-e3d5d6281895?auto=format&fit=crop&w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1649334020857-788daeee98dd?auto=format&fit=crop&w=800&q=80',
     ingredients: [
       '225g (half packet) penne, macaroni, or spiral/fusilli pasta',
       '1 can (400g) diced tomatoes (or 3 ripe fresh tomatoes, finely chopped)',
@@ -263,7 +263,7 @@ export const SEED_RECIPES: Recipe[] = [
     prep_time_minutes: 10,
     cost_level: 1,
     diet_tags: ['Vegetarian', 'Quick (<15m)', 'Budget'],
-    image_url: 'https://images.unsplash.com/photo-1573140247632-f8fd74997d5c?auto=format&fit=crop&w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1751199592465-f142293a8cc6?auto=format&fit=crop&w=800&q=80',
     ingredients: [
       '4 thick slices crusty bakery bread (roast paan or kade paan)',
       '2.5 tbsp softened butter',
